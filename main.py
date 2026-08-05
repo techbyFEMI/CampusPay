@@ -30,7 +30,7 @@ _expiry_in_progress: set[str] = set()
 
 async def expiry_job():
     while True:
-        await asyncio.sleep(60)
+        await asyncio.sleep(300)
         try:
             async with sessionLocal() as db:
                 result = await db.execute(
