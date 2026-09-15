@@ -18,9 +18,47 @@ import uuid
 
 
 class approles(Enum):
-    Vendor = "Vendor"
+    Rep = "Rep"
     Student = "Student"
     Admin = "Admin"
+
+
+class departments(Base):
+    __tablename__ = "department"
+
+    department_id: Mapped[str] = mapped_column(
+        String,
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    name: Mapped[str] = mapped_column(String)
+    code: Mapped[str] = mapped_column(String, unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
+class rosters(Base):
+    __tablename__ = "roster"
+
+    roster_id: Mapped[str] = mapped_column(
+        String,
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    department_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("department.department_id"),
+        index=True,
+    )
+    matric_number: Mapped[str] = mapped_column(String, index=True)
+    full_name: Mapped[str] = mapped_column(String)
+    is_claimed: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
 
 
 class payoutstat(Enum):
@@ -57,11 +95,14 @@ class users(Base):
         default=lambda: str(uuid.uuid4()),
     )
 
-    firebase_uid: Mapped[str] = mapped_column(String, unique=True, index=True)
+    firebase_uid: Mapped[str | None] = mapped_column(String, unique=True, index=True, nullable=True)
+    matric_number: Mapped[str | None] = mapped_column(String, unique=True, index=True, nullable=True)
+    department_id: Mapped[str | None] = mapped_column(String, ForeignKey("department.department_id"), nullable=True)
+    password_hash: Mapped[str | None] = mapped_column(String, nullable=True)
     role: Mapped[approles] = mapped_column(SAEnum(approles))
     full_name: Mapped[str] = mapped_column(String)
-    email: Mapped[str] = mapped_column(String, unique=True)
-    phone: Mapped[str | None] = mapped_column(String, unique=True)
+    email: Mapped[str | None] = mapped_column(String, unique=True, nullable=True)
+    phone: Mapped[str | None] = mapped_column(String, unique=True, nullable=True)
 
     vendor_bank_account: Mapped[str | None] = mapped_column(
         String,
@@ -223,6 +264,16 @@ class orders(Base):
     )
     payout_last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     payout_attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0", nullable=False)
+
+    is_collected: Mapped[bool] = mapped_column(
+        Boolean,
+        server_default="false",
+        default=False,
+    )
+    collected_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

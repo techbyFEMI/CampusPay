@@ -5,27 +5,29 @@ from decimal import Decimal
 from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-
 from sqlalchemy.orm import aliased
+
 from app.models.models import products as ProductsModel
-from app.models.models import approles
+from app.models.models import users, wallets, orders, orderstat, wallet_ledger, approles
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_firebase_user
-from app.models.models import users, wallets, orders, orderstat, wallet_ledger ,payoutstat
-from app.schemas.orders import PlaceOrderRequest, PlaceOrderResponse, ScanQRRequest, PendingTransactionItem, VendorPendingOrderItem
-from app.services.nomba import transfer_to_bank, lookup_account, verify_transfer_status
+from app.schemas.orders import (
+    PlaceOrderRequest,
+    PlaceOrderResponse,
+    ScanQRRequest,
+    PendingTransactionItem,
+    RepOrderItem,
+)
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
-PLATFORM_FEE = Decimal("20.00")
+PLATFORM_FEE = Decimal("0.00")
 QR_ALGORITHM = "HS256"
-ORDER_EXPIRY_HOURS = 24
 
 
 def _write_ledger(
@@ -38,7 +40,7 @@ def _write_ledger(
     reason: str,
     order_id: str | None = None,
 ) -> wallet_ledger:
-    """Create a ledger entry for a balance movement."""
+    """Create a double-entry ledger record for a wallet balance movement."""
     return wallet_ledger(
         wallet_id=wallet.wallet_id,
         user_id=user_id,
@@ -52,14 +54,19 @@ def _write_ledger(
     )
 
 
-
-
 @router.post("", response_model=PlaceOrderResponse, status_code=201)
 async def place_order(
     body: PlaceOrderRequest,
     firebase_user: dict = Depends(get_current_firebase_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Student places an order for a Rep's item.
+    - PIN is verified.
+    - Funds are debited from student wallet and credited IMMEDIATELY to Rep wallet.
+    - Double-entry ledger entries are recorded.
+    - Order is created as confirmed with is_collected=False.
+    - QR token is returned for physical collection/attendance scan.
+    """
     try:
         firebase_uid = firebase_user.get("uid")
 
@@ -69,105 +76,137 @@ async def place_order(
         student = user_result.scalar_one_or_none()
 
         if not student:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code=404, detail="Student user not found")
 
         if not student.transaction_pin_hash:
             raise HTTPException(
                 status_code=403,
-                detail="Transaction PIN not set. Please set a PIN in your profile before placing orders.",
+                detail="Transaction PIN not set. Please set a 4-digit PIN in your profile before placing orders.",
             )
 
         pin_valid = bcrypt.checkpw(body.pin.encode(), student.transaction_pin_hash.encode())
         if not pin_valid:
             raise HTTPException(status_code=403, detail="Incorrect transaction PIN")
 
-        wallet_result = await db.execute(
+        student_wallet_res = await db.execute(
             select(wallets)
             .where(wallets.user_id == student.user_id)
             .with_for_update()
         )
-        wallet = wallet_result.scalar_one_or_none()
+        student_wallet = student_wallet_res.scalar_one_or_none()
 
-        if not wallet:
-            raise HTTPException(status_code=404, detail="Wallet not found")
+        if not student_wallet:
+            raise HTTPException(status_code=404, detail="Student wallet not found")
 
-        vendor_result = await db.execute(
-            select(users).where(users.user_id == body.vendor_id)
+        target_rep_id = body.rep_id or body.vendor_id
+        rep_result = await db.execute(
+            select(users).where(users.user_id == target_rep_id)
         )
-        vendor = vendor_result.scalar_one_or_none()
+        rep = rep_result.scalar_one_or_none()
 
-        if not vendor:
-            raise HTTPException(status_code=404, detail="Vendor not found")
+        if not rep:
+            raise HTTPException(status_code=404, detail="Department Representative not found")
 
         total_charge = body.item_amount + PLATFORM_FEE
-        if wallet.available_balance < total_charge:
+        if student_wallet.available_balance < total_charge:
             raise HTTPException(
                 status_code=402,
                 detail=(
-                    f"Insufficient balance. Required: ₦{total_charge} "
-                    f"(item ₦{body.item_amount} + ₦{PLATFORM_FEE} fee), "
-                    f"Available: ₦{wallet.available_balance}"
+                    f"Insufficient wallet balance. Required: ₦{total_charge}, "
+                    f"Available: ₦{student_wallet.available_balance}"
                 ),
             )
 
-        balance_before = wallet.available_balance
-        wallet.available_balance -= total_charge
-        wallet.locked_balance += total_charge
-        wallet.updated_at = datetime.now(timezone.utc)
+        # Get or create Rep's wallet
+        rep_wallet_res = await db.execute(
+            select(wallets)
+            .where(wallets.user_id == rep.user_id)
+            .with_for_update()
+        )
+        rep_wallet = rep_wallet_res.scalar_one_or_none()
+        if not rep_wallet:
+            rep_wallet = wallets(
+                user_id=rep.user_id,
+                available_balance=Decimal("0.00"),
+                locked_balance=Decimal("0.00"),
+                currency="NGN",
+            )
+            db.add(rep_wallet)
+            await db.flush()
 
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=ORDER_EXPIRY_HOURS)
+        # Execute immediate transfer to Rep wallet
+        student_balance_before = student_wallet.available_balance
+        rep_balance_before = rep_wallet.available_balance
 
-        qr_payload = {
-            "order_id": None,
-            "vendor_id": body.vendor_id,
-            "exp": int(expires_at.timestamp()),
-        }
+        student_wallet.available_balance -= total_charge
+        student_wallet.updated_at = datetime.now(timezone.utc)
+
+        rep_wallet.available_balance += body.item_amount
+        rep_wallet.updated_at = datetime.now(timezone.utc)
 
         new_order = orders(
             student_id=student.user_id,
-            vendor_id=body.vendor_id,
+            vendor_id=rep.user_id,
             item_description=body.item_description,
             item_amount=body.item_amount,
-            escrow_hold=total_charge,
-            order_status=orderstat.pending,
+            escrow_hold=Decimal("0.00"),
+            order_status=orderstat.confirmed,
+            is_collected=False,
             qr_token="pending",
-            timer_expires_at=expires_at,
         )
         db.add(new_order)
         await db.flush()
 
-        qr_payload["order_id"] = new_order.order_id
+        # Generate QR payload
+        qr_payload = {
+            "order_id": new_order.order_id,
+            "rep_id": rep.user_id,
+            "vendor_id": rep.user_id,
+            "student_id": student.user_id,
+        }
         signed_token = jwt.encode(qr_payload, settings.SECRET_KEY, algorithm=QR_ALGORITHM)
         new_order.qr_token = signed_token
 
+        # Ledger record: Student Debit
         db.add(_write_ledger(
-            wallet=wallet,
+            wallet=student_wallet,
             user_id=student.user_id,
             direction="debit",
             amount=total_charge,
-            balance_before=balance_before,
+            balance_before=student_balance_before,
             reference=new_order.order_id,
-            reason="order_escrow_lock",
+            reason="student_order_payment",
+            order_id=new_order.order_id,
+        ))
+
+        # Ledger record: Rep Credit
+        db.add(_write_ledger(
+            wallet=rep_wallet,
+            user_id=rep.user_id,
+            direction="credit",
+            amount=body.item_amount,
+            balance_before=rep_balance_before,
+            reference=new_order.order_id,
+            reason="rep_payment_received",
             order_id=new_order.order_id,
         ))
 
         await db.commit()
 
         logger.info(
-            "order_placed",
+            "order_placed_and_credited",
             extra={
                 "order_id": new_order.order_id,
                 "student_id": student.user_id,
-                "vendor_id": body.vendor_id,
+                "rep_id": rep.user_id,
                 "item_amount": str(body.item_amount),
-                "total_charge": str(total_charge),
             },
         )
 
         return PlaceOrderResponse(
             order_id=new_order.order_id,
             qr_token=signed_token,
-            timer_expires_at=expires_at,
+            timer_expires_at=datetime.now(timezone.utc) + timedelta(days=365),
             total_charged=str(total_charge),
         )
 
@@ -179,8 +218,6 @@ async def place_order(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-
-
 @router.post("/{order_id}/scan", status_code=200)
 async def scan_order_qr(
     order_id: str,
@@ -188,398 +225,100 @@ async def scan_order_qr(
     firebase_user: dict = Depends(get_current_firebase_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Distribution Scan Endpoint:
+    - Scanned by Course Rep upon physical item distribution to a student.
+    - Validates QR token.
+    - Marks order as collected (is_collected=True, collected_at=now).
+    - Money is NOT moved during scan (funds were credited to Rep at checkout).
+    """
     try:
-        token_data = jwt.decode(body.qr_token, settings.SECRET_KEY, algorithms=[QR_ALGORITHM])
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="QR code has expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid QR token")
+        try:
+            token_data = jwt.decode(body.qr_token, settings.SECRET_KEY, algorithms=[QR_ALGORITHM])
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=401, detail="Invalid QR token")
 
-    token_order_id = token_data.get("order_id")
-    token_vendor_id = token_data.get("vendor_id")
+        token_order_id = token_data.get("order_id")
+        token_rep_id = token_data.get("rep_id") or token_data.get("vendor_id")
 
-    if token_order_id != order_id:
-        raise HTTPException(status_code=401, detail="QR token does not match this order")
+        if token_order_id != order_id:
+            raise HTTPException(status_code=401, detail="QR token does not match this order")
 
-    
-    firebase_uid = firebase_user.get("uid")
-    vendor_result = await db.execute(
-        select(users).where(users.firebase_uid == firebase_uid)
-    )
-    vendor = vendor_result.scalar_one_or_none()
-    if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
-
-   
-    order_result = await db.execute(
-        select(orders).where(orders.order_id == order_id).with_for_update()
-    )
-    order = order_result.scalar_one_or_none()
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-
-   
-    if order.order_status != orderstat.pending:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Order cannot be confirmed — current status: {order.order_status.value}",
-        )
-
-   
-    if token_vendor_id != vendor.user_id:
-        raise HTTPException(status_code=403, detail="This QR code is not for your store")
-
-
-    wallet_result = await db.execute(
-        select(wallets).where(wallets.user_id == order.student_id).with_for_update()
-    )
-    wallet = wallet_result.scalar_one_or_none()
-    if not wallet:
-        raise HTTPException(status_code=404, detail="Student wallet not found")
-
-    if not vendor.vendor_bank_account or not vendor.vendor_bank_code:
-        raise HTTPException(
-            status_code=422,
-            detail="Vendor has not set up bank account details for payouts",
-        )
-
-
-    try:
-        lookup_result = await lookup_account(
-            account_number=vendor.vendor_bank_account,
-            bank_code=str(vendor.vendor_bank_code),
-        )
-        if lookup_result.get("code") != "00":
-            logger.error(
-                "recipient_verification_failed order_id=%s vendor_id=%s lookup=%s",
-                order_id, vendor.user_id, lookup_result,
-            )
-            raise HTTPException(
-                status_code=422,
-                detail="Recipient account verification failed — transfer aborted",
-            )
-    except HTTPException:
-        raise
-    except Exception as lookup_err:
-        logger.error(
-            "recipient_lookup_exception order_id=%s vendor_id=%s error=%s",
-            order_id, vendor.user_id, lookup_err,
-        )
-        raise HTTPException(
-            status_code=502,
-            detail="Could not verify recipient account — transfer aborted",
-        )
-
-    # ── PHASE 1: Release escrow + mark confirmed — commit before Nomba ────
-    # locked_balance decreases by the full hold; platform fee is returned
-    # to the student since they picked up on time.
-    escrow_before = wallet.available_balance
-    wallet.locked_balance -= order.escrow_hold
-    wallet.available_balance += PLATFORM_FEE
-    wallet.updated_at = datetime.now(timezone.utc)
-    order.order_status = orderstat.confirmed
-
-
-    db.add(_write_ledger(
-        wallet=wallet,
-        user_id=order.student_id,
-        direction="credit",
-        amount=PLATFORM_FEE,
-        balance_before=escrow_before,
-        reference=order_id,
-        reason="platform_fee_refund",
-        order_id=order_id,
-    ))
-
-    try:
-        await db.commit()
-    except Exception as e:
-        await db.rollback()
-        logger.exception("scan_db_commit_failed order_id=%s error=%s", order_id, e)
-        raise HTTPException(status_code=500, detail="Failed to confirm order — please retry")
-
-    logger.info(
-        "escrow_released",
-        extra={
-            "order_id": order_id,
-            "student_id": order.student_id,
-            "vendor_id": vendor.user_id,
-            "escrow_hold": str(order.escrow_hold),
-            "platform_fee_refunded": str(PLATFORM_FEE),
-        },
-    )
-
-# ── PHASE 2: Nomba transfer — AFTER DB commit ─────────────────────────
-    nomba_ref = None
-    payout_status = payoutstat.failed
-    payout_error = None
-
-    try:
-        nomba_result = await transfer_to_bank(
-            amount=order.item_amount,
-            account_name=vendor.full_name,
-            account_number=vendor.vendor_bank_account,
-            bank_code=str(vendor.vendor_bank_code),
-            sender_name="CampusPay",
-            narration=f"Payment for order {order_id[:8]} — {order.item_description[:40]}",
-            merchantTxRef=order_id,  # idempotency key — safe to retry
-        )
-
-        if nomba_result.get("code") == "00":
-            nomba_ref = nomba_result.get("data", {}).get("transferRef") or order_id
-            payout_status = payoutstat.success
-            logger.info(
-                "nomba_transfer_success",
-                extra={
-                    "order_id": order_id,
-                    "vendor_id": vendor.user_id,
-                    "amount": str(order.item_amount),
-                    "merchantTxRef": order_id,
-                    "nomba_ref": nomba_ref,
-                },
-            )
-        else:
-            payout_error = str(nomba_result)
-            logger.error(
-                "[ACTION REQUIRED] nomba_transfer_failed",
-                extra={
-                    "order_id": order_id,
-                    "vendor_id": vendor.user_id,
-                    "amount": str(order.item_amount),
-                    "merchantTxRef": order_id,
-                    "nomba_response": payout_error,
-                },
-            )
-
-    except Exception as e:
-        payout_error = str(e)
-        logger.error(
-            "[ACTION REQUIRED] nomba_transfer_exception",
-            extra={
-                "order_id": order_id,
-                "vendor_id": vendor.user_id,
-                "amount": str(order.item_amount),
-                "error": payout_error,
-            },
-        )
-
-    # ── PHASE 3: Always append the payout outcome, success or failure ─────
-    try:
-        order.nomba_transfer_ref = nomba_ref
-        order.payout_status = payout_status
-        order.payout_last_error = payout_error
-        order.payout_attempts = (order.payout_attempts or 0) + 1
-        await db.commit()
-    except Exception as e:
-        logger.error("save_payout_result_failed order_id=%s error=%s", order_id, e)
-
-    return {
-        "message": "Order confirmed",
-        "order_id": order_id,
-        "amount_paid_to_vendor": str(order.item_amount),
-        "platform_fee_refunded": str(PLATFORM_FEE),
-        "nomba_transfer_ref": nomba_ref,
-        "payout_status": payout_status.value,
-    }
-
-@router.get("/{order_id}/transfer-status")
-async def get_transfer_status(
-    order_id: str,
-    firebase_user: dict = Depends(get_current_firebase_user),
-    db: AsyncSession = Depends(get_db),
-):
-   
-    try:
+        # Authenticate Rep
         firebase_uid = firebase_user.get("uid")
-        user_result = await db.execute(
+        rep_result = await db.execute(
             select(users).where(users.firebase_uid == firebase_uid)
         )
-        user = user_result.scalar_one_or_none()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        rep = rep_result.scalar_one_or_none()
+        if not rep:
+            raise HTTPException(status_code=404, detail="Course Representative user record not found")
 
+        role = firebase_user.get("role") or firebase_user.get("claims", {}).get("role") or rep.role.value
+        if role != approles.Rep.value and role != approles.Admin.value and rep.role != approles.Rep:
+            raise HTTPException(status_code=403, detail="Only Department Representatives can perform distribution scans.")
+
+        # Fetch Order
         order_result = await db.execute(
-            select(orders).where(orders.order_id == order_id)
+            select(orders).where(orders.order_id == order_id).with_for_update()
         )
         order = order_result.scalar_one_or_none()
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
 
-       
-        if user.user_id not in (order.student_id, order.vendor_id):
-            raise HTTPException(status_code=403, detail="Access denied")
+        if order.vendor_id != rep.user_id and token_rep_id != rep.user_id:
+            raise HTTPException(status_code=403, detail="This order belongs to a different department representative")
 
-        merchant_tx_ref = order.nomba_transfer_ref or order_id
+        if order.is_collected:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Item has ALREADY been collected on {order.collected_at.isoformat() if order.collected_at else 'previous scan'}.",
+            )
 
-        try:
-            nomba_status = await verify_transfer_status(merchant_tx_ref)
-        except Exception as e:
-            logger.error("transfer_status_check_failed order_id=%s error=%s", order_id, e)
-            raise HTTPException(status_code=502, detail="Could not reach Nomba for transfer status")
+        # Fetch student details for attendance confirmation output
+        student_res = await db.execute(
+            select(users).where(users.user_id == order.student_id)
+        )
+        student = student_res.scalar_one_or_none()
+
+        now_utc = datetime.now(timezone.utc)
+        order.is_collected = True
+        order.collected_at = now_utc
+
+        await db.commit()
 
         return {
-            "order_id": order_id,
-            "order_status": order.order_status.value,
-            "nomba_transfer_ref": order.nomba_transfer_ref,
-            "nomba_transfer_status": nomba_status,
+            "message": "Distribution attendance confirmed! Item marked as collected.",
+            "order_id": order.order_id,
+            "student_name": student.full_name if student else "Student",
+            "student_matric": student.matric_number if student else None,
+            "item_description": order.item_description,
+            "is_collected": True,
+            "collected_at": now_utc.isoformat(),
         }
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.exception("get_transfer_status_error order_id=%s error=%s", order_id, e)
+        await db.rollback()
+        logger.exception("scan_order_qr_error: %s", e)
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-
-
-@router.get("/pending", response_model=list[PendingTransactionItem])
-async def get_pending_transactions(
+@router.get("/rep", response_model=list[RepOrderItem])
+async def get_rep_orders(
     firebase_user: dict = Depends(get_current_firebase_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Rep Dashboard Endpoint:
+    Returns the list of all student orders for the Rep's items, including collection status.
+    """
     try:
         firebase_uid = firebase_user.get("uid")
-        if not firebase_uid:
-            raise HTTPException(status_code=401, detail="Invalid Firebase token")
-
         user_result = await db.execute(
             select(users).where(users.firebase_uid == firebase_uid)
         )
-        user = user_result.scalar_one_or_none()
-        if not user:
+        rep = user_result.scalar_one_or_none()
+        if not rep:
             raise HTTPException(status_code=404, detail="User not found")
-
-        vendor_alias = aliased(users)
-        student_alias = aliased(users)
-
-        if user.role == approles.Student:
-            stmt = (
-                select(
-                    orders.order_id,
-                    orders.item_description.label("name"),
-                    orders.item_amount.label("price"),
-                    ProductsModel.description.label("description"),
-                    vendor_alias.vendor_location.label("location"),
-                    vendor_alias.vendor_cover_image_url.label("image_url"),
-                    orders.qr_token,
-                    orders.created_at,
-                    vendor_alias.user_id.label("vendor_id"),
-                    vendor_alias.full_name.label("vendor_name"),
-                    orders.escrow_hold.label("total_charged"),
-                    orders.timer_expires_at.label("timer_expire_at"),
-                )
-                .join(vendor_alias, vendor_alias.user_id == orders.vendor_id)
-                .outerjoin(
-                    ProductsModel,
-                    (ProductsModel.vendor_id == orders.vendor_id)
-                    & (ProductsModel.name == orders.item_description),
-                )
-                .where(
-                    orders.student_id == user.user_id,
-                    orders.order_status == orderstat.pending,
-                )
-                .order_by(orders.created_at.desc())
-            )
-        elif user.role == approles.Vendor:
-            stmt = (
-                select(
-                    orders.order_id,
-                    orders.item_description.label("name"),
-                    orders.item_amount.label("price"),
-                    ProductsModel.description.label("description"),
-                    student_alias.vendor_location.label("location"),
-                    student_alias.vendor_cover_image_url.label("image_url"),
-                    orders.qr_token,
-                    orders.created_at,
-                    orders.vendor_id.label("vendor_id"),
-                    vendor_alias.full_name.label("vendor_name"),
-                    orders.escrow_hold.label("total_charged"),
-                    orders.timer_expires_at.label("timer_expire_at"),
-                )
-                .join(student_alias, student_alias.user_id == orders.student_id)
-                .join(vendor_alias, vendor_alias.user_id == orders.vendor_id)
-                .outerjoin(
-                    ProductsModel,
-                    (ProductsModel.vendor_id == orders.vendor_id)
-                    & (ProductsModel.name == orders.item_description),
-                )
-                .where(
-                    orders.vendor_id == user.user_id,
-                    orders.order_status == orderstat.pending,
-                )
-                .order_by(orders.created_at.desc())
-            )
-        else:
-            return []
-
-        result = await db.execute(stmt)
-        rows = result.fetchall()
-
-        items = []
-        for row in rows:
-            created_at_utc = row.created_at
-            if created_at_utc.tzinfo is None:
-                created_at_utc = created_at_utc.replace(tzinfo=timezone.utc)
-            created_at_str = created_at_utc.isoformat().replace("+00:00", "Z")
-
-            timer_expire_utc = row.timer_expire_at
-            if timer_expire_utc is not None and timer_expire_utc.tzinfo is None:
-                timer_expire_utc = timer_expire_utc.replace(tzinfo=timezone.utc)
-            timer_expire_str = (
-                timer_expire_utc.isoformat().replace("+00:00", "Z") if timer_expire_utc else None
-            )
-
-            items.append(
-                PendingTransactionItem(
-                    order_id=row.order_id,
-                    name=row.name,
-                    price=str(row.price),
-                    description=row.description,
-                    location=row.location,
-                    image_url=row.image_url,
-                    status="pending",
-                    qr_token=row.qr_token,
-                    created_at=created_at_str,
-                    vendor_id=row.vendor_id,
-                    vendor_name=row.vendor_name,
-                    total_charged=str(row.total_charged),
-                    timer_expire_at=timer_expire_str,
-                )
-            )
-        return items
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.exception("get_pending_transactions_error: %s", e)
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-
-@router.get("/vendor/pending", response_model=list[VendorPendingOrderItem])
-async def get_vendor_pending_orders(
-    firebase_user: dict = Depends(get_current_firebase_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """Return all pending orders for the authenticated vendor, including the buyer's name."""
-    try:
-        from app.models.models import approles
-        from sqlalchemy.orm import aliased
-
-        firebase_uid = firebase_user.get("uid")
-        if not firebase_uid:
-            raise HTTPException(status_code=401, detail="Invalid Firebase token")
-
-        user_result = await db.execute(
-            select(users).where(users.firebase_uid == firebase_uid)
-        )
-        current_user = user_result.scalar_one_or_none()
-        if not current_user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        if current_user.role != approles.Vendor:
-            raise HTTPException(status_code=403, detail="Vendor access required")
 
         student_alias = aliased(users)
         stmt = (
@@ -587,16 +326,15 @@ async def get_vendor_pending_orders(
                 orders.order_id,
                 orders.item_description,
                 orders.item_amount,
-                orders.escrow_hold,
                 orders.order_status,
+                orders.is_collected,
+                orders.collected_at,
                 orders.created_at,
                 student_alias.full_name.label("student_name"),
+                student_alias.matric_number.label("student_matric"),
             )
             .join(student_alias, student_alias.user_id == orders.student_id)
-            .where(
-                orders.vendor_id == current_user.user_id,
-                orders.order_status == orderstat.pending,
-            )
+            .where(orders.vendor_id == rep.user_id)
             .order_by(orders.created_at.desc())
         )
 
@@ -605,18 +343,20 @@ async def get_vendor_pending_orders(
 
         items = []
         for row in rows:
-            created_at_utc = row.created_at
-            if created_at_utc.tzinfo is None:
-                created_at_utc = created_at_utc.replace(tzinfo=timezone.utc)
+            created_at_str = row.created_at.isoformat().replace("+00:00", "Z") if row.created_at else ""
+            collected_at_str = row.collected_at.isoformat().replace("+00:00", "Z") if row.collected_at else None
+
             items.append(
-                VendorPendingOrderItem(
+                RepOrderItem(
                     order_id=row.order_id,
                     item_description=row.item_description,
                     item_amount=str(row.item_amount),
-                    escrow_hold=str(row.escrow_hold),
                     student_name=row.student_name,
-                    created_at=created_at_utc.isoformat().replace("+00:00", "Z"),
+                    student_matric=row.student_matric,
+                    created_at=created_at_str,
                     order_status=row.order_status.value,
+                    is_collected=row.is_collected,
+                    collected_at=collected_at_str,
                 )
             )
         return items
@@ -624,5 +364,69 @@ async def get_vendor_pending_orders(
     except HTTPException:
         raise
     except Exception as e:
-        logger.exception("get_vendor_pending_orders_error: %s", e)
+        logger.exception("get_rep_orders_error: %s", e)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/pending", response_model=list[PendingTransactionItem])
+async def get_pending_transactions(
+    firebase_user: dict = Depends(get_current_firebase_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Student Orders Endpoint: Returns active confirmed orders with QR codes."""
+    try:
+        firebase_uid = firebase_user.get("uid")
+        user_result = await db.execute(
+            select(users).where(users.firebase_uid == firebase_uid)
+        )
+        user = user_result.scalar_one_or_none()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        rep_alias = aliased(users)
+
+        stmt = (
+            select(
+                orders.order_id,
+                orders.item_description.label("name"),
+                orders.item_amount.label("price"),
+                orders.qr_token,
+                orders.created_at,
+                orders.is_collected,
+                rep_alias.user_id.label("rep_id"),
+                rep_alias.full_name.label("rep_name"),
+            )
+            .join(rep_alias, rep_alias.user_id == orders.vendor_id)
+            .where(orders.student_id == user.user_id)
+            .order_by(orders.created_at.desc())
+        )
+
+        result = await db.execute(stmt)
+        rows = result.fetchall()
+
+        items = []
+        for row in rows:
+            created_at_str = row.created_at.isoformat().replace("+00:00", "Z") if row.created_at else ""
+
+            items.append(
+                PendingTransactionItem(
+                    order_id=row.order_id,
+                    name=row.name,
+                    price=str(row.price),
+                    status="confirmed",
+                    qr_token=row.qr_token,
+                    created_at=created_at_str,
+                    rep_id=row.rep_id,
+                    rep_name=row.rep_name,
+                    total_charged=str(row.price),
+                    timer_expire_at=created_at_str,
+                    is_collected=row.is_collected,
+                )
+            )
+        return items
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("get_pending_transactions_error: %s", e)
         raise HTTPException(status_code=500, detail="Internal server error")

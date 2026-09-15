@@ -34,3 +34,40 @@ class AuthSyncRequest(BaseModel):
                 "Phone number must be a valid international number (e.g. +2348012345678)"
             )
         return phone
+
+
+class RepBootstrapRequest(BaseModel):
+    matric_number: str
+    full_name: str
+    email: str
+    password: str
+    department_name: str
+    department_code: str | None = None
+
+
+class LookupMatricRequest(BaseModel):
+    matric_number: str
+    department_code: str
+
+
+class ClaimAccountRequest(BaseModel):
+    matric_number: str
+    department_code: str
+    email: str
+    password: str
+    phone: str | None = None
+
+
+class LoginMatricRequest(BaseModel):
+    matric_number: str
+    password: str
+
+
+class RosterRow(BaseModel):
+    matric_number: str
+    full_name: str
+
+
+class RosterUploadRequest(BaseModel):
+    department_code: str
+    roster: list[RosterRow]
