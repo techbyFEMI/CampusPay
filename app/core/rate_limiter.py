@@ -26,3 +26,7 @@ class SimpleRateLimiter:
 login_rate_limiter = SimpleRateLimiter(requests_per_minute=5)
 claim_rate_limiter = SimpleRateLimiter(requests_per_minute=5)
 lookup_rate_limiter = SimpleRateLimiter(requests_per_minute=15)
+order_rate_limiter = SimpleRateLimiter(requests_per_minute=10)
+scan_rate_limiter = SimpleRateLimiter(requests_per_minute=20)
+payout_rate_limiter = SimpleRateLimiter(requests_per_minute=5)
+
