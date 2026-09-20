@@ -149,8 +149,8 @@ async def save_vendor_bank(
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        if user.role != approles.Vendor:
-            raise HTTPException(status_code=403, detail="Only vendors can set a payout account")
+        if user.role not in (approles.Rep, approles.Admin):
+            raise HTTPException(status_code=403, detail="Only department representatives or admins can set a payout account")
 
         user.vendor_bank_account = body.account_number
         user.vendor_bank_code = body.bank_code

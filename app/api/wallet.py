@@ -130,8 +130,8 @@ async def get_transactions(
             else:
                 main_query = union_all(credits_query, debits_query)
 
-        elif user.role == approles.Vendor:
-            # Vendors only receive payments (credits) when orders placed with them are processed
+        elif user.role in (approles.Rep, approles.Admin):
+            # Reps/Admins receive payments (credits) when orders placed with them are processed
             credits_query = select(
                 literal_column("'credit'").label("type"),
                 orders.item_description.label("description"),

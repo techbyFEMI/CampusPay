@@ -48,6 +48,7 @@ app.include_router(webhooks.router, tags=["webhooks"])
 app.include_router(wallet.router, prefix="/api", tags=["wallet"])
 app.include_router(profile.router)
 app.include_router(orders.router)
+app.include_router(orders.rep_router)
 app.include_router(catalog.router)
 
 
@@ -82,8 +83,9 @@ async def health(db=Depends(get_db)):
         "environment": "production",
         "uptime_seconds": uptime_seconds,
         "database": db_status,
-        **({"database_error": db_error} if db_error else {}),
+        **({"database_error": "Database connection error"} if db_error else {}),
     }
+
 
 
 @app.get("/api/admin/reconciliation")

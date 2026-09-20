@@ -41,7 +41,7 @@ async def list_vendors(
 ) -> list[VendorSummary]:
    
     try:
-        stmt = select(users).where(users.role == approles.Vendor)
+        stmt = select(users).where(users.role.in_([approles.Rep, approles.Admin]))
 
         if is_open is not None:
             stmt = stmt.where(users.vendor_is_open == is_open)
@@ -101,7 +101,7 @@ async def get_vendor(
         vendor_result = await db.execute(
             select(users).where(
                 users.user_id == vendor_id,
-                users.role == approles.Vendor, 
+                users.role.in_([approles.Rep, approles.Admin]), 
             )
         )
         vendor = vendor_result.scalar_one_or_none()
@@ -163,8 +163,8 @@ async def _resolve_vendor(firebase_user: dict, db: AsyncSession) -> users:
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    if user.role != approles.Vendor:
-        raise HTTPException(status_code=403, detail="Vendor access required")
+    if user.role not in (approles.Rep, approles.Admin):
+        raise HTTPException(status_code=403, detail="Representative or Admin access required")
     return user
 
 
