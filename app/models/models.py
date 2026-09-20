@@ -6,6 +6,7 @@ from sqlalchemy import (
     DateTime,
     Numeric,
     Boolean,
+    CheckConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
@@ -124,6 +125,18 @@ class users(Base):
         nullable=True,
     )
 
+    failed_pin_attempts: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+        nullable=False,
+    )
+
+    pin_locked_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
     vendor_location: Mapped[str | None] = mapped_column(
         String,
         nullable=True,
@@ -176,6 +189,10 @@ class accounts(Base):
 class wallets(Base):
 
     __tablename__ = "wallet"
+    __table_args__ = (
+        CheckConstraint("available_balance >= 0", name="ck_wallets_available_balance_non_negative"),
+        CheckConstraint("locked_balance >= 0", name="ck_wallets_locked_balance_non_negative"),
+    )
 
     wallet_id: Mapped[str] = mapped_column(
         String,
@@ -219,11 +236,21 @@ class webhook_events(Base):
 class orders(Base):
 
     __tablename__ = "order"
+    __table_args__ = (
+        CheckConstraint("item_amount > 0", name="ck_orders_item_amount_positive"),
+    )
 
     order_id: Mapped[str] = mapped_column(
         String,
         primary_key=True,
         default=lambda: str(uuid.uuid4()),
+    )
+
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String,
+        unique=True,
+        index=True,
+        nullable=True,
     )
 
     student_id: Mapped[str] = mapped_column(
@@ -236,10 +263,10 @@ class orders(Base):
         ForeignKey("user.user_id"),
     )
 
-    item_description: Mapped[str] = mapped_column(Text)
     item_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2))
-    escrow_hold: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     order_status: Mapped[orderstat] = mapped_column(SAEnum(orderstat))
+
+
 
     qr_token: Mapped[str] = mapped_column(
         Text,
@@ -316,6 +343,9 @@ class products(Base):
 class wallet_ledger(Base):
     
     __tablename__ = "wallet_ledger"
+    __table_args__ = (
+        CheckConstraint("amount > 0", name="ck_wallet_ledger_amount_positive"),
+    )
 
     ledger_id: Mapped[str] = mapped_column(
         String,
