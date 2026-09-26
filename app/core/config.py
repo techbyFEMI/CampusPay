@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     NOMBA_BASE_URL: str
     DATABASE_URL: str
     SECRET_KEY: str
+    ADMIN_BOOTSTRAP_SECRET: str | None = None  # Required to call /bootstrap-rep
     QR_SECRET_KEY: str | None = None          # Independent signing key for QR tokens; falls back to SECRET_KEY if not set in env
 
     # Supabase Auth
