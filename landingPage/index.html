@@ -117,9 +117,9 @@
   }
   h1{
     font-family:'Baloo 2',sans-serif;font-weight:900;color:var(--white);
-    font-size:clamp(36px,5.5vw,72px);
-    line-height:1.08;
-    letter-spacing:-1.2px;
+    font-size:clamp(44px,6.5vw,82px);
+    line-height:1.05;
+    letter-spacing:-1.5px;
     margin-bottom:20px;
     max-width:20ch;
   }
@@ -401,7 +401,7 @@
       flex: 1;
       min-height: 0;
     }
-    h1{font-size:clamp(30px, 8.5vw, 48px);margin-bottom:10px;letter-spacing:-1.2px;line-height:1.07;}
+    h1{font-size:clamp(34px, 9.5vw, 54px);margin-bottom:12px;letter-spacing:-1.2px;line-height:1.06;}
     .hero-sub{font-size:15px;line-height:1.5;margin-bottom:0;max-width:100%;opacity:0.92;}
     .hero-ctas{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:0;width:100%;}
     .btn, .btn-outline{width:100%;justify-content:center;padding:14px 18px;font-size:16px;white-space:normal;border-radius:14px;}
@@ -418,37 +418,54 @@
       width: 100%;
       flex-shrink: 0;
     }
-    /* Step dots */
-    .m-step-dots {
+    /* Step boxes tabs */
+    .m-step-tabs {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 7px;
+      justify-content: space-between;
+      gap: 3px;
       margin-bottom: 12px;
       width: 100%;
     }
-    .m-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.3);
-      transition: all 0.35s ease;
+    .m-tab {
+      flex: 1;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.85);
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 8px 3px;
+      border-radius: 9px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .m-tab.active {
+      background: var(--white);
+      color: var(--blue);
+      border-color: var(--white);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      font-weight: 800;
+    }
+    .m-tab.m-tab-result.active {
+      background: #FFE600;
+      color: #00227B;
+      border-color: #FFE600;
+      box-shadow: 0 4px 14px rgba(255,230,0,0.35);
+    }
+    .m-tab-op {
+      color: rgba(255,255,255,0.7);
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
       flex: none;
+      padding: 0 1px;
     }
-    .m-dot.active {
-      background: var(--yellow);
-      width: 26px;
-      border-radius: 4px;
-      box-shadow: 0 0 10px rgba(255,237,3,0.65);
-    }
-    .m-dot.done {
-      background: rgba(255,255,255,0.65);
-    }
-    /* Hide old badge/progress/tab elements */
+    /* Hide old badge/progress elements */
     .eq-badge-wrap, .eq-badge, .eq-badge-step { display: none; }
-    /* Progress bar & step tabs hidden — replaced by dots */
     .eq-progress-bar, .eq-progress-fill { display: none; }
-    .m-step-tabs, .m-tab, .m-tab-op { display: none; }
     .m-stage-card {
       background: var(--white);
       border-radius: 18px;
@@ -616,13 +633,17 @@
 
       <!-- MOBILE ONLY COMPACT STEPPER -->
       <div class="equation-mobile">
-        <!-- Clean dot-step indicator -->
-        <div class="m-step-dots" id="mStepDots">
-          <div class="m-dot active" data-dot="0"></div>
-          <div class="m-dot" data-dot="1"></div>
-          <div class="m-dot" data-dot="2"></div>
-          <div class="m-dot" data-dot="3"></div>
-          <div class="m-dot" data-dot="4"></div>
+        <!-- Step boxes tabs with + and = operators -->
+        <div class="m-step-tabs" id="mStepTabs">
+          <button class="m-tab active" data-mstep="0">Step 1</button>
+          <span class="m-tab-op">+</span>
+          <button class="m-tab" data-mstep="1">Step 2</button>
+          <span class="m-tab-op">+</span>
+          <button class="m-tab" data-mstep="2">Step 3</button>
+          <span class="m-tab-op">+</span>
+          <button class="m-tab" data-mstep="3">Step 4</button>
+          <span class="m-tab-op">=</span>
+          <button class="m-tab m-tab-result" data-mstep="4">Result</button>
         </div>
         <div class="m-stage-card" id="mStageCard">
           <div class="m-stage-icon" id="mStageIcon">
@@ -863,7 +884,7 @@
     const mTitle     = document.getElementById('mStageTitle');
     const mDesc      = document.getElementById('mStageDesc');
     const mStageCard = document.getElementById('mStageCard');
-    const dots       = document.querySelectorAll('.m-dot');
+    const mobileTabs = document.querySelectorAll('.m-tab');
 
     let currentStep = 0;
     let stepsComplete = false;  // true after the last step is reached
@@ -879,11 +900,10 @@
       currentStep = idx;
       stepsComplete = (idx >= TOTAL_STEPS - 1);
 
-      // Update dots
-      dots.forEach((dot, i) => {
-        dot.classList.remove('active', 'done');
-        if (i === idx) dot.classList.add('active');
-        else if (i < idx) dot.classList.add('done');
+      // Update step tabs
+      mobileTabs.forEach((tab, i) => {
+        if (i === idx) tab.classList.add('active');
+        else tab.classList.remove('active');
       });
 
       // Card content with subtle slide-in
@@ -920,9 +940,9 @@
       }
     }
 
-    // Dot click = jump to that step
-    dots.forEach((dot, idx) => {
-      dot.addEventListener('click', () => {
+    // Step box tab click = jump to that step
+    mobileTabs.forEach((tab, idx) => {
+      tab.addEventListener('click', () => {
         updateStepUI(idx, true);
         if (idx === TOTAL_STEPS - 1) stepsComplete = true;
       });
