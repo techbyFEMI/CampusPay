@@ -371,54 +371,49 @@
   @media (max-width:768px){
     .wrap{padding:0 18px;}
     .backdrop{
-      min-height:auto;
-      height:auto;
-      padding-bottom:0;
-      overflow:visible;
-    }
-    .mobile-hero-track {
-      position: relative;
-      height: 175vh;
-    }
-    .hero-sticky-content {
-      position: sticky;
-      top: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
       height: 100vh;
       height: 100dvh;
+      padding-bottom: 0;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding-bottom: 16px;
-      box-sizing: border-box;
+    }
+    .backdrop > .wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
     }
-    header{padding:12px 0 0;}
+    header{padding:12px 0 0;flex-shrink:0;}
     .logo-word{font-size:20px;}
     .logo-mark{width:32px;height:32px;}
     .nav-link{display:none;}
     .nav-btn{padding:8px 16px;font-size:13.5px;}
-    .hero{padding:10px 0 12px;display:flex;flex-direction:column;justify-content:space-between;flex:1;}
-    h1{font-size:clamp(25px, 6.8vw, 36px);margin-bottom:8px;letter-spacing:-0.8px;line-height:1.15;}
-    .hero-sub{font-size:13.5px;line-height:1.45;margin-bottom:14px;max-width:100%;}
-    .hero-ctas{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:12px;width:100%;}
-    .btn, .btn-outline{width:100%;justify-content:center;padding:11px 18px;font-size:14.5px;white-space:normal;}
-    
-    .equation-container {
-      display: none;
-    }
+    .hero{padding:10px 0 8px;display:flex;flex-direction:column;flex:1;min-height:0;}
+    h1{font-size:clamp(24px, 6.5vw, 34px);margin-bottom:6px;letter-spacing:-0.8px;line-height:1.12;}
+    .hero-sub{font-size:13px;line-height:1.4;margin-bottom:10px;max-width:100%;}
+    .hero-ctas{flex-direction:column;align-items:stretch;gap:7px;margin-bottom:10px;width:100%;}
+    .btn, .btn-outline{width:100%;justify-content:center;padding:10px 18px;font-size:14px;white-space:normal;}
+
+    /* Hide desktop equation on mobile */
+    .equation-container { display: none; }
+
+    /* Mobile stepper */
     .equation-mobile {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 100%;
-      margin-top: 6px;
+      flex-shrink: 0;
     }
     .eq-badge-wrap {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
     .eq-badge {
       background: rgba(255,255,255,0.15);
@@ -442,36 +437,36 @@
     }
     .eq-progress-bar {
       width: 100%;
-      max-width: 340px;
       height: 3px;
       background: rgba(255,255,255,0.18);
       border-radius: 4px;
-      margin: 0 auto 8px;
+      margin: 0 0 6px;
       overflow: hidden;
     }
     .eq-progress-fill {
       height: 100%;
       width: 20%;
       background: linear-gradient(90deg, var(--yellow), #FFFFFF);
-      transition: width 0.25s ease-out;
+      transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
     }
+    /* Step tabs row */
     .m-step-tabs {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 2px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       width: 100%;
     }
     .m-tab {
       flex: 1;
-      padding: 6px 2px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.75);
+      padding: 5px 2px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.75);
       font-family: 'Baloo 2', sans-serif;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
@@ -488,7 +483,7 @@
       font-family: 'Baloo 2', sans-serif;
       font-size: 13px;
       font-weight: 800;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255,255,255,0.4);
       transition: all 0.25s ease;
       flex: none;
       padding: 0 1px;
@@ -496,58 +491,50 @@
     .m-tab-op.active {
       color: var(--yellow);
       transform: scale(1.25);
-      text-shadow: 0 0 8px rgba(255, 237, 3, 0.7);
+      text-shadow: 0 0 8px rgba(255,237,3,0.7);
     }
+    /* Main stage card */
     .m-stage-card {
       background: var(--white);
-      border-radius: 16px;
-      padding: 14px 16px;
+      border-radius: 14px;
+      padding: 12px 14px;
       width: 100%;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.2);
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: all 0.3s ease;
     }
     .m-stage-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
       background: #EEF2FF;
       display: flex;
       align-items: center;
       justify-content: center;
       flex: none;
     }
-    .m-stage-icon svg {
-      width: 22px;
-      height: 22px;
-    }
-    .m-stage-info {
+    .m-stage-icon svg { width: 20px; height: 20px; }
+    .m-stage-info { display: flex; flex-direction: column; gap: 1px; }
+    .m-stage-tag { font-size: 9px; font-weight: 800; color: var(--blue); letter-spacing: 0.5px; text-transform: uppercase; }
+    .m-stage-title { font-family: 'Baloo 2', sans-serif; font-size: 14px; font-weight: 800; color: var(--ink); margin: 0; line-height: 1.2; }
+    .m-stage-desc { font-size: 11.5px; color: var(--ink-soft); margin: 1px 0 0; line-height: 1.3; }
+    /* Scroll hint arrow */
+    .m-scroll-hint {
       display: flex;
-      flex-direction: column;
-      gap: 1px;
+      align-items: center;
+      gap: 5px;
+      color: rgba(255,255,255,0.6);
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 6px;
+      transition: opacity 0.3s;
     }
-    .m-stage-tag {
-      font-size: 9.5px;
-      font-weight: 800;
-      color: var(--blue);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .m-stage-title {
-      font-family: 'Baloo 2', sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--ink);
-      margin: 0;
-      line-height: 1.2;
-    }
-    .m-stage-desc {
-      font-size: 12px;
-      color: var(--ink-soft);
-      margin: 1px 0 0;
-      line-height: 1.3;
+    .m-scroll-hint.hidden { opacity: 0; pointer-events: none; }
+    .m-scroll-hint svg { animation: bounceDown 1.2s ease-in-out infinite; }
+    @keyframes bounceDown {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
     }
 
     .compare{padding:44px 0;}
@@ -582,10 +569,8 @@
 <body>
 
 <!-- ==================== HERO SECTION ==================== -->
-<div class="backdrop">
-  <div class="mobile-hero-track">
-    <div class="hero-sticky-content">
-      <div class="wrap">
+<div class="backdrop" id="heroBackdrop">
+  <div class="wrap">
     <header>
       <a href="#" class="logo">
         <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
@@ -619,7 +604,7 @@
         </a>
       </div>
 
-      <!-- DESKTOP / TABLET EQUATION (Former Design Restored 100%) -->
+      <!-- DESKTOP / TABLET EQUATION -->
       <div class="equation-container">
         <div class="equation">
           <div class="eq-card">
@@ -631,9 +616,7 @@
               <span class="eq-title">Matric Signup + NIN</span>
             </div>
           </div>
-
           <div class="eq-op">+</div>
-
           <div class="eq-card">
             <div class="eq-icon">
               <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0052FE" stroke-width="1.8"/><text x="12" y="16.5" font-size="11" font-weight="700" fill="#0052FE" text-anchor="middle" font-family="Inter">₦</text></svg>
@@ -643,9 +626,7 @@
               <span class="eq-title">Fund Wallet</span>
             </div>
           </div>
-
           <div class="eq-op">+</div>
-
           <div class="eq-card">
             <div class="eq-icon">
               <svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#0052FE" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="#0052FE" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#0052FE" stroke-width="1.8"/></svg>
@@ -655,9 +636,7 @@
               <span class="eq-title">Select &amp; Pay</span>
             </div>
           </div>
-
           <div class="eq-op">+</div>
-
           <div class="eq-card">
             <div class="eq-icon">
               <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="15.5" x2="20" y2="15.5" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="19" x2="20" y2="19" stroke="#0052FE" stroke-width="1.8"/></svg>
@@ -667,9 +646,7 @@
               <span class="eq-title">QR Distribution</span>
             </div>
           </div>
-
           <div class="eq-op">=</div>
-
           <div class="eq-result">
             <div class="eq-icon">
               <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#0052FE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -682,7 +659,7 @@
         </div>
       </div>
 
-      <!-- MOBILE ONLY COMPACT STEPPER (No Extended Blue Height) -->
+      <!-- MOBILE ONLY COMPACT STEPPER -->
       <div class="equation-mobile">
         <div class="eq-badge-wrap">
           <span class="eq-badge">HOW IT WORKS</span>
@@ -712,10 +689,11 @@
             <p class="m-stage-desc" id="mStageDesc">Enter matric number &amp; NIN to create account and set 4-digit PIN in under 60s.</p>
           </div>
         </div>
+        <div class="m-scroll-hint" id="mScrollHint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          <span>Scroll for next step</span>
+        </div>
       </div>
-
-    </div>
-  </div>
     </div>
   </div>
 </div>
@@ -895,112 +873,241 @@
 
 <script>
   (function() {
+    /* ============================================================
+       MOBILE STEP SCROLL-LOCK
+       - On mobile only, intercept wheel & touch events
+       - While steps are not complete, prevent default scroll
+         and advance steps instead
+       - Once all 5 steps shown, release lock and allow normal scroll
+    ============================================================ */
+    const TOTAL_STEPS = 5;
     const stepsData = [
       {
         tag: 'STEP 1 OF 4',
         title: 'Matric Signup + NIN',
-        desc: 'Enter matric number & NIN to create account and set 4-digit PIN in under 60s.',
+        desc: 'Enter your matric number & NIN to create your account and set a 4-digit PIN in under 60s.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>'
       },
       {
         tag: 'STEP 2 OF 4',
         title: 'Fund Wallet',
-        desc: 'Transfer from any bank app (GTBank, OPay, FirstBank) to your virtual account.',
+        desc: 'Transfer from any bank app (GTBank, OPay, FirstBank) to your dedicated virtual account number.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0052FE" stroke-width="1.8"/><text x="12" y="16.5" font-size="11" font-weight="700" fill="#0052FE" text-anchor="middle" font-family="Inter">₦</text></svg>'
       },
       {
         tag: 'STEP 3 OF 4',
         title: 'Select & Pay',
-        desc: 'Browse departmental catalog, pick item, confirm with matric number & 4-digit PIN.',
+        desc: 'Browse the departmental catalog, pick your item, and confirm with your matric number & PIN.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#0052FE" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="#0052FE" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#0052FE" stroke-width="1.8"/></svg>'
       },
       {
         tag: 'STEP 4 OF 4',
         title: 'QR Distribution',
-        desc: 'Show your digital QR pass on collection day for instant camera verification.',
+        desc: 'Show your digital QR pass on collection day for instant camera verification. No paper needed.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="15.5" x2="20" y2="15.5" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="19" x2="20" y2="19" stroke="#0052FE" stroke-width="1.8"/></svg>'
       },
       {
         tag: '= RESULT',
         title: 'Zero Campus Stress',
-        desc: 'No paper receipts, no unconfirmed bank transfers, zero manual record keeping.',
+        desc: 'No paper receipts, no unconfirmed bank transfers, zero manual record keeping. Ever.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#0052FE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
       }
     ];
 
-    const fillBar = document.getElementById('eqProgressFill');
-    const eqBadgeStep = document.getElementById('eqBadgeStep');
+    const fillBar    = document.getElementById('eqProgressFill');
+    const badgeStep  = document.getElementById('eqBadgeStep');
+    const scrollHint = document.getElementById('mScrollHint');
+    const mIcon      = document.getElementById('mStageIcon');
+    const mTag       = document.getElementById('mStageTag');
+    const mTitle     = document.getElementById('mStageTitle');
+    const mDesc      = document.getElementById('mStageDesc');
     const mobileTabs = document.querySelectorAll('.m-tab');
-
-    const mIcon = document.getElementById('mStageIcon');
-    const mTag = document.getElementById('mStageTag');
-    const mTitle = document.getElementById('mStageTitle');
-    const mDesc = document.getElementById('mStageDesc');
+    const mobileOps  = document.querySelectorAll('.m-tab-op');
 
     let currentStep = 0;
-    let autoRotateTimer = null;
+    let stepsComplete = false;  // true after the last step is reached
+    let isLocked = false;       // true while page is at top and steps not done
+    let touchStartY = 0;
+    let stepCooldown = false;   // debounce rapid wheel events
 
-    function updateStepUI(stepIndex) {
-      currentStep = stepIndex;
+    function isMobile() {
+      return window.innerWidth <= 768;
+    }
 
-      const percentage = Math.min(100, Math.max(20, (stepIndex + 1) * 20));
-      if (fillBar) fillBar.style.width = percentage + '%';
+    function updateStepUI(idx, animate) {
+      currentStep = idx;
+      stepsComplete = (idx >= TOTAL_STEPS - 1);
 
-      if (eqBadgeStep) {
-        eqBadgeStep.textContent = stepsData[stepIndex].tag;
+      // Progress bar
+      const pct = Math.round(((idx + 1) / TOTAL_STEPS) * 100);
+      if (fillBar) fillBar.style.width = pct + '%';
+
+      // Badge
+      if (badgeStep) badgeStep.textContent = stepsData[idx].tag;
+
+      // Tabs highlight
+      mobileTabs.forEach((tab, i) => {
+        tab.classList.toggle('active', i === idx);
+      });
+      mobileOps.forEach((op, i) => {
+        op.classList.toggle('active', i < idx);
+      });
+
+      // Card content with subtle slide-in
+      if (mIcon && mTag && mTitle && mDesc) {
+        const d = stepsData[idx];
+        if (animate) {
+          mStageCard.style.opacity = '0';
+          mStageCard.style.transform = 'translateY(8px)';
+          requestAnimationFrame(() => {
+            mIcon.innerHTML  = d.icon;
+            mTag.textContent  = d.tag;
+            mTitle.textContent = d.title;
+            mDesc.textContent  = d.desc;
+            requestAnimationFrame(() => {
+              mStageCard.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
+              mStageCard.style.opacity = '1';
+              mStageCard.style.transform = 'translateY(0)';
+            });
+          });
+        } else {
+          mIcon.innerHTML  = d.icon;
+          mTag.textContent  = d.tag;
+          mTitle.textContent = d.title;
+          mDesc.textContent  = d.desc;
+        }
       }
 
-      mobileTabs.forEach((tab, idx) => {
-        if (idx === stepIndex) {
-          tab.classList.add('active');
-        } else {
-          tab.classList.remove('active');
-        }
-      });
+      // Scroll hint
+      if (scrollHint) {
+        scrollHint.classList.toggle('hidden', stepsComplete);
+      }
 
-      const mobileOps = document.querySelectorAll('.m-tab-op');
-      mobileOps.forEach((op, idx) => {
-        if (idx < stepIndex) {
-          op.classList.add('active');
-        } else {
-          op.classList.remove('active');
-        }
-      });
-
-      if (mIcon && mTag && mTitle && mDesc) {
-        const data = stepsData[stepIndex];
-        mIcon.innerHTML = data.icon;
-        mTag.textContent = data.tag;
-        mTitle.textContent = data.title;
-        mDesc.textContent = data.desc;
+      // Once all done, release lock
+      if (stepsComplete) {
+        isLocked = false;
       }
     }
 
+    // Tab click (manual override – still works)
     mobileTabs.forEach((tab, idx) => {
-      tab.addEventListener('click', function() {
-        updateStepUI(idx);
+      tab.addEventListener('click', () => {
+        updateStepUI(idx, true);
+        // If user taps the last step, release lock
+        if (idx === TOTAL_STEPS - 1) stepsComplete = true;
       });
     });
 
-    function onScroll() {
-      if (window.innerWidth > 768) return;
-      const track = document.querySelector('.mobile-hero-track');
-      if (!track) return;
-      const rect = track.getBoundingClientRect();
-      const totalScrollable = rect.height - window.innerHeight;
-      if (totalScrollable <= 0) return;
-
-      const currentScroll = -rect.top;
-      let progress = currentScroll / totalScrollable;
-      progress = Math.max(0, Math.min(1, progress));
-
-      let stepIdx = Math.min(4, Math.floor(progress * 5));
-      updateStepUI(stepIdx);
+    // -------- Lock management --------
+    function lockPage() {
+      if (isLocked) return;
+      // Scroll to very top of page so hero is fully in view
+      window.scrollTo({ top: 0 });
+      isLocked = true;
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    updateStepUI(0);
+    function advanceStep() {
+      if (currentStep < TOTAL_STEPS - 1) {
+        updateStepUI(currentStep + 1, true);
+      } else {
+        // All steps done – release
+        stepsComplete = true;
+        isLocked = false;
+      }
+    }
+
+    function retreatStep() {
+      if (currentStep > 0) {
+        updateStepUI(currentStep - 1, true);
+        stepsComplete = false;
+        isLocked = true;  // re-lock if user scrolls back up into steps
+      }
+    }
+
+    // -------- Wheel handler --------
+    function onWheel(e) {
+      if (!isMobile()) return;
+
+      const atTop = window.scrollY <= 10;
+
+      // Activate lock when at top and steps not done
+      if (atTop && !stepsComplete) {
+        isLocked = true;
+      }
+
+      if (!isLocked) return;
+
+      // Prevent page from scrolling
+      e.preventDefault();
+
+      if (stepCooldown) return;
+      stepCooldown = true;
+      setTimeout(() => { stepCooldown = false; }, 380);
+
+      if (e.deltaY > 0) {
+        advanceStep();
+      } else if (e.deltaY < 0) {
+        retreatStep();
+      }
+    }
+
+    // -------- Touch handlers --------
+    function onTouchStart(e) {
+      if (!isMobile()) return;
+      touchStartY = e.touches[0].clientY;
+    }
+
+    function onTouchMove(e) {
+      if (!isMobile()) return;
+
+      const atTop = window.scrollY <= 10;
+      if (atTop && !stepsComplete) {
+        isLocked = true;
+      }
+
+      if (!isLocked) return;
+      e.preventDefault();
+    }
+
+    function onTouchEnd(e) {
+      if (!isMobile() || !isLocked) return;
+
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) < 20) return; // too small a swipe
+
+      if (stepCooldown) return;
+      stepCooldown = true;
+      setTimeout(() => { stepCooldown = false; }, 380);
+
+      if (dy > 0) {
+        advanceStep(); // swipe up = next step
+      } else {
+        retreatStep(); // swipe down = prev step
+      }
+    }
+
+    // -------- Scroll listener: re-lock if user scrolls back to top --------
+    function onScroll() {
+      if (!isMobile()) return;
+      if (window.scrollY <= 5 && !stepsComplete) {
+        isLocked = true;
+      }
+    }
+
+    // Attach with { passive:false } so we can preventDefault
+    window.addEventListener('wheel',      onWheel,      { passive: false });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove',  onTouchMove,  { passive: false });
+    window.addEventListener('touchend',   onTouchEnd,   { passive: true });
+    window.addEventListener('scroll',     onScroll,     { passive: true });
+
+    // Init
+    updateStepUI(0, false);
+    // Start locked on mobile
+    if (isMobile()) {
+      isLocked = true;
+      window.scrollTo({ top: 0 });
+    }
   })();
 </script>
 </body>
