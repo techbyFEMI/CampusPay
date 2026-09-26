@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CampusPay — The Smart Way to Pay & Collect on Campus</title>
 <meta name="description" content="CampusPay gives Nigerian university students a dedicated virtual wallet account and class reps a digital departmental catalog — making campus payments, handout fees, and QR-verified collection effortless.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,22 +19,39 @@
     --ink-soft:#5B5B66;
     --line:#E3E6EF;
   }
-  *{box-sizing:border-box;margin:0;padding:0;}
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  *{box-sizing:border-box;}
   body{
     color:var(--ink);
     font-family:'Inter',sans-serif;
     background:var(--white);
     line-height:1.5;
+    -webkit-text-size-adjust: 100%;
   }
   .display{font-family:'Baloo 2',sans-serif;}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 48px;}
+  .wrap{
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+    box-sizing: border-box;
+  }
 
   /* ---------- BRAND BACKDROP ---------- */
   .backdrop{
     position:relative;
+    width: 100%;
+    max-width: 100%;
     background:radial-gradient(140% 160% at 10% -10%, #1a6bff 0%, var(--blue) 30%, var(--blue-panel) 60%, var(--navy) 100%);
     overflow:hidden;
     min-height:100vh;
+    min-height:100dvh;
     display:flex;
     flex-direction:column;
   }
@@ -61,11 +78,12 @@
 
   /* ---------- HEADER ---------- */
   header{
-    padding:28px 0 0;
+    padding:24px 0 0;
     display:flex;
     align-items:center;
     justify-content:space-between;
     flex-shrink:0;
+    width: 100%;
   }
   .logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
   .logo-mark{width:40px;height:40px;flex:none;}
@@ -80,6 +98,7 @@
     transition:transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow:0 4px 20px rgba(0,0,0,0.15);
     letter-spacing:0.1px;
+    white-space: nowrap;
   }
   .nav-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.25);}
 
@@ -89,26 +108,28 @@
     display:flex;
     flex-direction:column;
     justify-content:center;
-    padding:20px 0 40px;
+    padding:24px 0 40px;
+    width: 100%;
+    min-width: 0;
   }
   h1{
     font-family:'Baloo 2',sans-serif;font-weight:900;color:var(--white);
-    font-size:clamp(44px,6vw,80px);
+    font-size:clamp(36px,5.5vw,72px);
     line-height:1.08;
-    letter-spacing:-1.5px;
-    margin-bottom:22px;
-    max-width:18ch;
+    letter-spacing:-1.2px;
+    margin-bottom:20px;
+    max-width:20ch;
   }
   .hero-sub{
     color:rgba(255,255,255,.88);
-    font-size:clamp(17px,1.7vw,21px);
+    font-size:clamp(16px,1.6vw,20px);
     max-width:52ch;
     line-height:1.6;
-    margin-bottom:36px;
+    margin-bottom:32px;
     font-weight:400;
   }
 
-  .hero-ctas{display:flex;align-items:center;gap:14px;margin-bottom:44px;flex-wrap:wrap;}
+  .hero-ctas{display:flex;align-items:center;gap:14px;margin-bottom:40px;flex-wrap:wrap;}
   .btn{
     display:inline-flex;align-items:center;gap:8px;
     background:var(--yellow);color:var(--navy);
@@ -116,6 +137,7 @@
     padding:15px 36px;border-radius:12px;text-decoration:none;
     box-shadow:0 6px 24px rgba(0,0,0,0.3);transition:all 0.25s ease;
     letter-spacing:0.1px;
+    white-space: nowrap;
   }
   .btn:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,0.4);}
   .btn-outline{
@@ -128,25 +150,41 @@
     font-family:'Baloo 2',sans-serif;font-weight:700;font-size:17px;
     border-radius:12px;text-decoration:none;transition:all 0.25s ease;
     letter-spacing:0.1px;
+    white-space: nowrap;
   }
   .btn-outline:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,0.7);}
 
   /* ---------- EQUATION ---------- */
+  .equation-scroll-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 0 16px;
+    scrollbar-width: none;
+  }
+  .equation-scroll-wrap::-webkit-scrollbar {
+    display: none;
+  }
   .equation{
-    display:flex;align-items:center;gap:20px;flex-wrap:nowrap;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    width: max-content;
+    padding: 4px 4px;
   }
   .eq-card{
-    background:var(--white);border-radius:20px;padding:22px 26px;
-    display:flex;flex-direction:column;align-items:center;gap:12px;
-    width:190px;flex:none;
+    background:var(--white);border-radius:20px;padding:20px 22px;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    width:175px;flex:none;
     box-shadow:0 16px 40px rgba(0,0,0,0.2);
     transition:transform 0.2s ease, box-shadow 0.2s ease;
   }
   .eq-card:hover{transform:translateY(-3px);box-shadow:0 22px 50px rgba(0,0,0,0.28);}
-  .eq-card svg{width:40px;height:40px;}
+  .eq-card svg{width:36px;height:36px;}
   .eq-card span{
     font-family:'Baloo 2',sans-serif;
-    font-size:14.5px;font-weight:700;color:var(--ink);
+    font-size:14px;font-weight:700;color:var(--ink);
     text-align:center;line-height:1.3;
   }
   .eq-card .eq-step{
@@ -154,65 +192,25 @@
     text-transform:uppercase;letter-spacing:0.5px;
   }
   .eq-op{
-    font-family:'Baloo 2',sans-serif;font-size:34px;font-weight:700;
+    font-family:'Baloo 2',sans-serif;font-size:30px;font-weight:700;
     color:rgba(255,255,255,0.7);flex:none;
   }
   .eq-result{
-    background:var(--white);border-radius:20px;padding:22px 26px;
-    display:flex;flex-direction:column;align-items:center;gap:12px;
-    flex:none;
+    background:var(--white);border-radius:20px;padding:20px 22px;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    width:175px;flex:none;
     box-shadow:0 16px 40px rgba(0,0,0,0.2);
     transition:transform 0.2s ease, box-shadow 0.2s ease;
   }
   .eq-result:hover{transform:translateY(-3px);box-shadow:0 22px 50px rgba(0,0,0,0.28);}
-  .eq-result svg{width:40px;height:40px;}
+  .eq-result svg{width:36px;height:36px;}
   .eq-result span{
-    font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;
+    font-family:'Baloo 2',sans-serif;font-weight:800;font-size:14.5px;
     color:var(--blue);
   }
   .eq-result .eq-step{
     font-size:11px;font-weight:600;color:var(--blue-panel);
     text-transform:uppercase;letter-spacing:0.5px;
-  }
-
-  @media (max-width:1000px){
-    .equation{gap:14px;}
-    .eq-card{width:155px;padding:16px 14px;}
-    .eq-card svg{width:34px;height:34px;}
-    .eq-result svg{width:34px;height:34px;}
-    .eq-op{font-size:26px;}
-  }
-  /* Mobile: horizontal scroll strip */
-  @media (max-width:760px){
-    .equation{
-      flex-direction:row;
-      flex-wrap:nowrap;
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-      gap:10px;
-      padding-bottom:12px;
-      scrollbar-width:none;
-    }
-    .equation::-webkit-scrollbar{display:none;}
-    .eq-card{
-      width:130px;
-      min-width:130px;
-      padding:14px 12px;
-      gap:8px;
-      border-radius:14px;
-    }
-    .eq-card svg,.eq-result svg{width:28px;height:28px;}
-    .eq-card span{font-size:12.5px;}
-    .eq-card .eq-step{font-size:10px;}
-    .eq-result{
-      min-width:130px;
-      padding:14px 12px;
-      gap:8px;
-      border-radius:14px;
-    }
-    .eq-result span{font-size:12.5px;}
-    .eq-result .eq-step{font-size:10px;}
-    .eq-op{font-size:20px;flex:none;}
   }
 
   /* ---------- COMPARE ---------- */
@@ -221,10 +219,9 @@
     font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
     color:var(--blue);margin-bottom:12px;
   }
-  h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(26px,3.5vw,40px);margin:0 0 12px;letter-spacing:-0.5px;line-height:1.15;}
+  h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,40px);margin:0 0 12px;letter-spacing:-0.5px;line-height:1.15;}
   .section-sub{color:var(--ink-soft);margin:0 0 40px;max-width:52ch;font-size:16px;line-height:1.6;}
   .split{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-  @media (max-width:640px){.split{grid-template-columns:1fr;}}
   .panel{border-radius:16px;padding:28px;border:1.5px solid var(--line);background:#FAFAFC;}
   .panel-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:20px;}
   .row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:14.5px;}
@@ -236,7 +233,6 @@
   /* ---------- FEATURES ---------- */
   .features-sec{padding:80px 0;background:#F6F8FC;}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
-  @media (max-width:680px){.grid-2{grid-template-columns:1fr;}}
   .feat-card{
     background:var(--white);border-radius:20px;padding:34px;
     border:1.5px solid var(--line);
@@ -266,7 +262,6 @@
     gap:28px;
     margin-top:48px;
   }
-  @media (max-width:680px){.steps-grid{grid-template-columns:1fr;}}
   .step-card{
     background:var(--white);
     border:1.5px solid var(--line);
@@ -351,29 +346,59 @@
   .foot-wrap a{color:rgba(255,255,255,0.75);text-decoration:none;margin-left:20px;transition:color 0.2s;}
   .foot-wrap a:hover{color:var(--white);}
 
+  /* MOBILE MEDIA QUERY */
   @media (max-width:768px){
-    .wrap{padding:0 20px;}
-    .backdrop{min-height:100svh;height:auto;}
-    header{padding:20px 0 0;}
-    .logo-word{font-size:22px;}
+    .wrap{padding:0 18px;}
+    .backdrop{min-height:100vh;min-height:100dvh;height:auto;}
+    header{padding:16px 0 0;}
+    .logo-word{font-size:20px;}
+    .logo-mark{width:32px;height:32px;}
     .nav-link{display:none;}
-    .nav-btn{padding:8px 18px;font-size:14px;}
-    .hero{padding:16px 0 28px;justify-content:flex-start;padding-top:24px;}
-    h1{font-size:clamp(34px,9vw,52px);margin-bottom:14px;letter-spacing:-1px;}
-    .hero-sub{font-size:15.5px;margin-bottom:24px;max-width:100%;}
-    .hero-ctas{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:28px;}
-    .btn,.btn-outline{width:100%;justify-content:center;padding:14px 20px;font-size:16px;}
-    .compare{padding:52px 0;}
-    .features-sec{padding:52px 0;}
-    .steps-sec{padding:52px 0;}
-    .steps-grid{grid-template-columns:1fr;margin-top:28px;gap:16px;}
-    .step-card{padding:24px;}
-    .step-card h3{font-size:17px;}
-    .trust-sec{padding:44px 0;}
-    .trust-box{flex-direction:column;gap:14px;padding:24px;}
-    .cta-sec{padding:56px 0 64px;}
-    .feat-card{padding:24px;}
+    .nav-btn{padding:8px 16px;font-size:13.5px;}
+    .hero{padding:20px 0 28px;}
+    h1{font-size:clamp(28px, 7.5vw, 42px);margin-bottom:14px;letter-spacing:-0.8px;line-height:1.15;}
+    .hero-sub{font-size:15px;line-height:1.55;margin-bottom:24px;max-width:100%;}
+    .hero-ctas{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:24px;width:100%;}
+    .btn, .btn-outline{width:100%;justify-content:center;padding:13px 20px;font-size:15.5px;white-space:normal;}
+    
+    .equation-scroll-wrap{padding:4px 0 12px;}
+    .eq-card, .eq-result{
+      width:140px;
+      padding:16px 12px;
+      gap:8px;
+      border-radius:14px;
+    }
+    .eq-card svg, .eq-result svg{width:28px;height:28px;}
+    .eq-card span, .eq-result span{font-size:12.5px;}
+    .eq-card .eq-step, .eq-result .eq-step{font-size:10px;}
+    .eq-op{font-size:22px;}
+
+    .compare{padding:44px 0;}
+    .split{grid-template-columns:1fr;gap:16px;}
+    .panel{padding:20px 16px;}
     .row{font-size:13px;}
+
+    .features-sec{padding:44px 0;}
+    .grid-2{grid-template-columns:1fr;gap:20px;}
+    .feat-card{padding:22px 18px;}
+    .feat-card h3{font-size:19px;}
+
+    .steps-sec{padding:44px 0;}
+    .steps-grid{grid-template-columns:1fr;margin-top:24px;gap:16px;}
+    .step-card{padding:22px 18px;}
+    .step-card h3{font-size:18px;}
+
+    .trust-sec{padding:36px 0;}
+    .trust-box{flex-direction:column;gap:14px;padding:22px 18px;}
+    .trust-box h3{font-size:18px;}
+    .trust-box p{font-size:14px;}
+
+    .cta-sec{padding:48px 0;}
+    .cta-sec h2{font-size:26px;}
+
+    footer{padding:28px 0;}
+    .foot-wrap{flex-direction:column;align-items:flex-start;gap:14px;}
+    .foot-wrap a{margin-left:0;margin-right:16px;}
   }
 </style>
 </head>
@@ -415,36 +440,38 @@
         </a>
       </div>
 
-      <!-- Equation Row -->
-      <div class="equation">
-        <div class="eq-card">
-          <span class="eq-step">Step 1</span>
-          <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>
-          <span>Matric Signup + NIN</span>
-        </div>
-        <div class="eq-op">+</div>
-        <div class="eq-card">
-          <span class="eq-step">Step 2</span>
-          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0052FE" stroke-width="1.8"/><text x="12" y="16.5" font-size="11" font-weight="700" fill="#0052FE" text-anchor="middle" font-family="Inter">₦</text></svg>
-          <span>Fund Wallet</span>
-        </div>
-        <div class="eq-op">+</div>
-        <div class="eq-card">
-          <span class="eq-step">Step 3</span>
-          <svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#0052FE" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="#0052FE" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#0052FE" stroke-width="1.8"/></svg>
-          <span>Select &amp; Pay</span>
-        </div>
-        <div class="eq-op">+</div>
-        <div class="eq-card">
-          <span class="eq-step">Step 4</span>
-          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="15.5" x2="20" y2="15.5" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="19" x2="20" y2="19" stroke="#0052FE" stroke-width="1.8"/></svg>
-          <span>QR Distribution</span>
-        </div>
-        <div class="eq-op">=</div>
-        <div class="eq-result">
-          <span class="eq-step">Result</span>
-          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#0052FE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Zero Campus Stress</span>
+      <!-- Equation Row with dedicated horizontal scroll container -->
+      <div class="equation-scroll-wrap">
+        <div class="equation">
+          <div class="eq-card">
+            <span class="eq-step">Step 1</span>
+            <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>
+            <span>Matric Signup + NIN</span>
+          </div>
+          <div class="eq-op">+</div>
+          <div class="eq-card">
+            <span class="eq-step">Step 2</span>
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0052FE" stroke-width="1.8"/><text x="12" y="16.5" font-size="11" font-weight="700" fill="#0052FE" text-anchor="middle" font-family="Inter">₦</text></svg>
+            <span>Fund Wallet</span>
+          </div>
+          <div class="eq-op">+</div>
+          <div class="eq-card">
+            <span class="eq-step">Step 3</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#0052FE" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="#0052FE" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#0052FE" stroke-width="1.8"/></svg>
+            <span>Select &amp; Pay</span>
+          </div>
+          <div class="eq-op">+</div>
+          <div class="eq-card">
+            <span class="eq-step">Step 4</span>
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="15.5" x2="20" y2="15.5" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="19" x2="20" y2="19" stroke="#0052FE" stroke-width="1.8"/></svg>
+            <span>QR Distribution</span>
+          </div>
+          <div class="eq-op">=</div>
+          <div class="eq-result">
+            <span class="eq-step">Result</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#0052FE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Zero Campus Stress</span>
+          </div>
         </div>
       </div>
     </div>
