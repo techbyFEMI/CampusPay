@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CampusPay — The Smart Way to Pay & Collect on Campus</title>
 <meta name="description" content="CampusPay gives Nigerian university students a dedicated virtual wallet account and class reps a digital departmental catalog — making campus payments, handout fees, and QR-verified collection effortless.">
+<meta name="theme-color" content="#0052FE">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -391,17 +393,24 @@
     .logo-mark{width:36px;height:36px;}
     .nav-link{display:none;}
     .nav-btn{padding:11px 22px;font-size:14.5px;border-radius:12px;}
-    .hero{padding:20px 0 24px;display:flex;flex-direction:column;justify-content:space-between;flex:1;min-height:0;}
-    h1{font-size:clamp(32px, 9.5vw, 52px);margin-bottom:14px;letter-spacing:-1.5px;line-height:1.06;}
-    .hero-sub{font-size:16px;line-height:1.55;margin-bottom:0;max-width:100%;opacity:0.93;}
-    .hero-ctas{flex-direction:column;align-items:stretch;gap:11px;margin-bottom:0;width:100%;}
-    .btn, .btn-outline{width:100%;justify-content:center;padding:15px 18px;font-size:16.5px;white-space:normal;border-radius:14px;}
+    .hero{
+      padding: 16px 0 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+      min-height: 0;
+    }
+    h1{font-size:clamp(30px, 8.5vw, 48px);margin-bottom:10px;letter-spacing:-1.2px;line-height:1.07;}
+    .hero-sub{font-size:15px;line-height:1.5;margin-bottom:0;max-width:100%;opacity:0.92;}
+    .hero-ctas{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:0;width:100%;}
+    .btn, .btn-outline{width:100%;justify-content:center;padding:14px 18px;font-size:16px;white-space:normal;border-radius:14px;}
     .btn{box-shadow:0 8px 28px rgba(0,0,0,0.35);}
 
     /* Hide desktop equation on mobile */
     .equation-container { display: none; }
 
-    /* Mobile stepper */
+    /* Mobile stepper — clean dot-progress style */
     .equation-mobile {
       display: flex;
       flex-direction: column;
@@ -409,105 +418,50 @@
       width: 100%;
       flex-shrink: 0;
     }
-    .eq-badge-wrap {
+    /* Step dots */
+    .m-step-dots {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 9px;
-    }
-    .eq-badge {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: var(--white);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
-    .eq-badge-step {
-      background: var(--yellow);
-      color: var(--navy);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      transition: all 0.3s;
-    }
-    .eq-progress-bar {
-      width: 100%;
-      height: 3px;
-      background: rgba(255,255,255,0.18);
-      border-radius: 4px;
-      margin: 0 0 10px;
-      overflow: hidden;
-    }
-    .eq-progress-fill {
-      height: 100%;
-      width: 20%;
-      background: linear-gradient(90deg, var(--yellow), #FFFFFF);
-      transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
-    }
-    /* Step tabs row */
-    .m-step-tabs {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 3px;
-      margin-bottom: 10px;
+      gap: 7px;
+      margin-bottom: 12px;
       width: 100%;
     }
-    .m-tab {
-      flex: 1;
-      padding: 9px 2px;
-      border-radius: 9px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.75);
-      font-family: 'Baloo 2', sans-serif;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      text-align: center;
-      transition: all 0.25s ease;
-    }
-    .m-tab.active {
-      background: var(--white);
-      color: var(--blue);
-      border-color: var(--white);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-    }
-    .m-tab-op {
-      font-family: 'Baloo 2', sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      color: rgba(255,255,255,0.4);
-      transition: all 0.25s ease;
+    .m-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transition: all 0.35s ease;
       flex: none;
-      padding: 0 1px;
     }
-    .m-tab-op.active {
-      color: var(--yellow);
-      transform: scale(1.25);
-      text-shadow: 0 0 8px rgba(255,237,3,0.7);
+    .m-dot.active {
+      background: var(--yellow);
+      width: 26px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(255,237,3,0.65);
     }
-    /* Main stage card */
+    .m-dot.done {
+      background: rgba(255,255,255,0.65);
+    }
+    /* Hide old badge/progress/tab elements */
+    .eq-badge-wrap, .eq-badge, .eq-badge-step { display: none; }
+    /* Progress bar & step tabs hidden — replaced by dots */
+    .eq-progress-bar, .eq-progress-fill { display: none; }
+    .m-step-tabs, .m-tab, .m-tab-op { display: none; }
     .m-stage-card {
       background: var(--white);
-      border-radius: 20px;
-      padding: 20px 22px;
+      border-radius: 18px;
+      padding: 18px 20px;
       width: 100%;
-      box-shadow: 0 18px 48px rgba(0,0,0,0.28);
+      box-shadow: 0 16px 44px rgba(0,0,0,0.25);
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
     }
     .m-stage-icon {
-      width: 56px;
-      height: 56px;
+      width: 52px;
+      height: 52px;
       border-radius: 14px;
       background: #EEF2FF;
       display: flex;
@@ -515,11 +469,11 @@
       justify-content: center;
       flex: none;
     }
-    .m-stage-icon svg { width: 28px; height: 28px; }
-    .m-stage-info { display: flex; flex-direction: column; gap: 4px; }
-    .m-stage-tag { font-size: 11px; font-weight: 800; color: var(--blue); letter-spacing: 0.6px; text-transform: uppercase; }
-    .m-stage-title { font-family: 'Baloo 2', sans-serif; font-size: 19px; font-weight: 800; color: var(--ink); margin: 0; line-height: 1.2; }
-    .m-stage-desc { font-size: 13.5px; color: var(--ink-soft); margin: 2px 0 0; line-height: 1.4; }
+    .m-stage-icon svg { width: 26px; height: 26px; }
+    .m-stage-info { display: flex; flex-direction: column; gap: 3px; }
+    .m-stage-tag { display: none; }
+    .m-stage-title { font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800; color: var(--ink); margin: 0; line-height: 1.2; }
+    .m-stage-desc { font-size: 13px; color: var(--ink-soft); margin: 2px 0 0; line-height: 1.4; }
     /* Scroll hint arrow */
     .m-scroll-hint {
       display: flex;
@@ -662,32 +616,21 @@
 
       <!-- MOBILE ONLY COMPACT STEPPER -->
       <div class="equation-mobile">
-        <div class="eq-badge-wrap">
-          <span class="eq-badge">HOW IT WORKS</span>
-          <span class="eq-badge-step" id="eqBadgeStep">STEP 1 OF 4</span>
-        </div>
-        <div class="eq-progress-bar">
-          <div class="eq-progress-fill" id="eqProgressFill"></div>
-        </div>
-        <div class="m-step-tabs">
-          <button class="m-tab active" data-mstep="0">Step 1</button>
-          <span class="m-tab-op active" data-mop="0">+</span>
-          <button class="m-tab" data-mstep="1">Step 2</button>
-          <span class="m-tab-op" data-mop="1">+</span>
-          <button class="m-tab" data-mstep="2">Step 3</button>
-          <span class="m-tab-op" data-mop="2">+</span>
-          <button class="m-tab" data-mstep="3">Step 4</button>
-          <span class="m-tab-op" data-mop="3">=</span>
-          <button class="m-tab" data-mstep="4">Result</button>
+        <!-- Clean dot-step indicator -->
+        <div class="m-step-dots" id="mStepDots">
+          <div class="m-dot active" data-dot="0"></div>
+          <div class="m-dot" data-dot="1"></div>
+          <div class="m-dot" data-dot="2"></div>
+          <div class="m-dot" data-dot="3"></div>
+          <div class="m-dot" data-dot="4"></div>
         </div>
         <div class="m-stage-card" id="mStageCard">
           <div class="m-stage-icon" id="mStageIcon">
             <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>
           </div>
           <div class="m-stage-info">
-            <span class="m-stage-tag" id="mStageTag">STEP 1 OF 4</span>
             <h3 class="m-stage-title" id="mStageTitle">Matric Signup + NIN</h3>
-            <p class="m-stage-desc" id="mStageDesc">Enter matric number &amp; NIN to create account and set 4-digit PIN in under 60s.</p>
+            <p class="m-stage-desc" id="mStageDesc">Enter your matric number &amp; NIN to create your account and set a 4-digit PIN in under 60s.</p>
           </div>
         </div>
         <div class="m-scroll-hint" id="mScrollHint">
@@ -915,15 +858,12 @@
       }
     ];
 
-    const fillBar    = document.getElementById('eqProgressFill');
-    const badgeStep  = document.getElementById('eqBadgeStep');
     const scrollHint = document.getElementById('mScrollHint');
     const mIcon      = document.getElementById('mStageIcon');
-    const mTag       = document.getElementById('mStageTag');
     const mTitle     = document.getElementById('mStageTitle');
     const mDesc      = document.getElementById('mStageDesc');
-    const mobileTabs = document.querySelectorAll('.m-tab');
-    const mobileOps  = document.querySelectorAll('.m-tab-op');
+    const mStageCard = document.getElementById('mStageCard');
+    const dots       = document.querySelectorAll('.m-dot');
 
     let currentStep = 0;
     let stepsComplete = false;  // true after the last step is reached
@@ -939,30 +879,21 @@
       currentStep = idx;
       stepsComplete = (idx >= TOTAL_STEPS - 1);
 
-      // Progress bar
-      const pct = Math.round(((idx + 1) / TOTAL_STEPS) * 100);
-      if (fillBar) fillBar.style.width = pct + '%';
-
-      // Badge
-      if (badgeStep) badgeStep.textContent = stepsData[idx].tag;
-
-      // Tabs highlight
-      mobileTabs.forEach((tab, i) => {
-        tab.classList.toggle('active', i === idx);
-      });
-      mobileOps.forEach((op, i) => {
-        op.classList.toggle('active', i < idx);
+      // Update dots
+      dots.forEach((dot, i) => {
+        dot.classList.remove('active', 'done');
+        if (i === idx) dot.classList.add('active');
+        else if (i < idx) dot.classList.add('done');
       });
 
       // Card content with subtle slide-in
-      if (mIcon && mTag && mTitle && mDesc) {
+      if (mIcon && mTitle && mDesc) {
         const d = stepsData[idx];
         if (animate) {
           mStageCard.style.opacity = '0';
           mStageCard.style.transform = 'translateY(8px)';
           requestAnimationFrame(() => {
-            mIcon.innerHTML  = d.icon;
-            mTag.textContent  = d.tag;
+            mIcon.innerHTML   = d.icon;
             mTitle.textContent = d.title;
             mDesc.textContent  = d.desc;
             requestAnimationFrame(() => {
@@ -972,8 +903,7 @@
             });
           });
         } else {
-          mIcon.innerHTML  = d.icon;
-          mTag.textContent  = d.tag;
+          mIcon.innerHTML   = d.icon;
           mTitle.textContent = d.title;
           mDesc.textContent  = d.desc;
         }
@@ -990,11 +920,10 @@
       }
     }
 
-    // Tab click (manual override – still works)
-    mobileTabs.forEach((tab, idx) => {
-      tab.addEventListener('click', () => {
+    // Dot click = jump to that step
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', () => {
         updateStepUI(idx, true);
-        // If user taps the last step, release lock
         if (idx === TOTAL_STEPS - 1) stepsComplete = true;
       });
     });
