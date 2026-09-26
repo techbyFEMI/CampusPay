@@ -155,185 +155,83 @@
   }
   .btn-outline:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,0.7);}
 
-  /* ---------- EQUATION SCROLL TRACK & STEPS ---------- */
-  .hero-scroll-hint {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: rgba(255,255,255,0.75);
-    font-size: 13.5px;
-    font-weight: 600;
-    margin-top: 18px;
-    letter-spacing: 0.2px;
-  }
-  .bounce-arrow {
-    animation: bounce 1.8s infinite;
-  }
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(4px); }
-    60% { transform: translateY(2px); }
-  }
-
-  .eq-scroll-section {
-    position: relative;
-    height: 180vh;
+  /* ---------- EQUATION (DESKTOP & TABLET FORMER DESIGN) ---------- */
+  .equation-container {
     width: 100%;
+    margin-top: 32px;
   }
-  .eq-sticky-box {
-    position: sticky;
-    top: 14vh;
-    z-index: 10;
-    width: 100%;
-    padding: 16px 0 28px;
-  }
-  .eq-badge-wrap {
+  .equation{
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .eq-badge {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: var(--white);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    padding: 4px 12px;
-    border-radius: 20px;
-  }
-  .eq-badge-step {
-    background: var(--yellow);
-    color: var(--navy);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    transition: all 0.3s;
-  }
-
-  .eq-progress-bar {
-    width: 100%;
-    max-width: 480px;
-    height: 4px;
-    background: rgba(255,255,255,0.18);
-    border-radius: 4px;
-    margin: 0 auto 24px;
-    overflow: hidden;
-  }
-  .eq-progress-fill {
-    height: 100%;
-    width: 20%;
-    background: linear-gradient(90deg, var(--yellow), #FFFFFF);
-    transition: width 0.25s ease-out;
-  }
-
-  .equation-desktop {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    gap: 16px;
     width: 100%;
     justify-content: space-between;
   }
-  .eq-card-item {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
+  .eq-card, .eq-result {
+    background: var(--white);
     border-radius: 18px;
-    padding: 18px 14px;
+    padding: 20px 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex: 1;
     min-width: 0;
-    opacity: 0.35;
-    transform: scale(0.96);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--white);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .eq-card-item .eq-icon svg {
-    width: 34px;
-    height: 34px;
-    stroke: var(--white);
+  .eq-card:hover, .eq-result:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 50px rgba(0,0,0,0.28);
   }
-  .eq-card-item .eq-info {
+  .eq-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .eq-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+  .eq-info {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
     text-align: center;
   }
-  .eq-card-item .eq-step {
+  .eq-step {
     font-size: 11px;
     font-weight: 700;
+    color: var(--blue);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: rgba(255,255,255,0.75);
   }
-  .eq-card-item .eq-title {
+  .eq-result .eq-step {
+    color: var(--blue-panel);
+  }
+  .eq-title {
     font-family: 'Baloo 2', sans-serif;
     font-size: 14px;
     font-weight: 700;
-    color: var(--white);
-    line-height: 1.25;
-    text-align: center;
-  }
-
-  .eq-card-item.active {
-    background: var(--white);
-    border-color: var(--white);
-    opacity: 1;
-    transform: scale(1.04);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
     color: var(--ink);
+    line-height: 1.3;
   }
-  .eq-card-item.active .eq-icon svg {
-    stroke: var(--blue);
-  }
-  .eq-card-item.active .eq-step {
-    color: var(--blue);
-  }
-  .eq-card-item.active .eq-title {
-    color: var(--ink);
-  }
-
-  .eq-card-item.result-card.active {
-    background: var(--white);
-    border: 2px solid var(--yellow);
-    box-shadow: 0 20px 50px rgba(255, 237, 3, 0.4);
-  }
-  .eq-card-item.result-card.active .eq-icon svg {
-    stroke: var(--blue);
-  }
-  .eq-card-item.result-card.active .eq-step {
-    color: var(--blue-panel);
-  }
-  .eq-card-item.result-card.active .eq-title {
-    color: var(--blue);
+  .eq-result .eq-title {
     font-weight: 800;
+    color: var(--blue);
   }
-
-  .eq-op-item {
+  .eq-op {
     font-family: 'Baloo 2', sans-serif;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.25);
-    transition: all 0.3s ease;
+    color: rgba(255,255,255,0.75);
     flex: none;
   }
-  .eq-op-item.active {
-    color: var(--yellow);
-    transform: scale(1.25);
-    text-shadow: 0 0 12px rgba(255, 237, 3, 0.6);
-  }
 
+  /* MOBILE-ONLY STEPPER */
   .equation-mobile {
     display: none;
-    width: 100%;
   }
 
   /* ---------- COMPARE ---------- */
@@ -475,27 +373,20 @@
     .backdrop{
       min-height:auto;
       height:auto;
-      padding-bottom:0;
+      padding-bottom:28px;
     }
     header{padding:16px 0 0;}
     .logo-word{font-size:20px;}
     .logo-mark{width:32px;height:32px;}
     .nav-link{display:none;}
     .nav-btn{padding:8px 16px;font-size:13.5px;}
-    .hero{padding:20px 0 24px;}
+    .hero{padding:20px 0 20px;}
     h1{font-size:clamp(28px, 7.5vw, 40px);margin-bottom:14px;letter-spacing:-0.8px;line-height:1.15;}
     .hero-sub{font-size:15px;line-height:1.55;margin-bottom:24px;max-width:100%;}
     .hero-ctas{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:20px;width:100%;}
     .btn, .btn-outline{width:100%;justify-content:center;padding:13px 20px;font-size:15.5px;white-space:normal;}
     
-    .eq-scroll-section {
-      height: 160vh;
-    }
-    .eq-sticky-box {
-      top: 10vh;
-      padding: 12px 0 20px;
-    }
-    .equation-desktop {
+    .equation-container {
       display: none;
     }
     .equation-mobile {
@@ -503,24 +394,67 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
+      margin-top: 14px;
+    }
+    .eq-badge-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .eq-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: var(--white);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .eq-badge-step {
+      background: var(--yellow);
+      color: var(--navy);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      transition: all 0.3s;
+    }
+    .eq-progress-bar {
+      width: 100%;
+      max-width: 340px;
+      height: 3.5px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 4px;
+      margin: 0 auto 12px;
+      overflow: hidden;
+    }
+    .eq-progress-fill {
+      height: 100%;
+      width: 20%;
+      background: linear-gradient(90deg, var(--yellow), #FFFFFF);
+      transition: width 0.25s ease-out;
     }
     .m-step-tabs {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
-      margin-bottom: 14px;
+      gap: 5px;
+      margin-bottom: 12px;
       width: 100%;
     }
     .m-tab {
       flex: 1;
-      padding: 8px 4px;
-      border-radius: 12px;
+      padding: 7px 4px;
+      border-radius: 10px;
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: rgba(255, 255, 255, 0.75);
       font-family: 'Baloo 2', sans-serif;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
@@ -531,23 +465,23 @@
       background: var(--white);
       color: var(--blue);
       border-color: var(--white);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
     }
     .m-stage-card {
       background: var(--white);
-      border-radius: 20px;
-      padding: 20px;
+      border-radius: 18px;
+      padding: 16px 18px;
       width: 100%;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.22);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       transition: all 0.3s ease;
     }
     .m-stage-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       background: #EEF2FF;
       display: flex;
       align-items: center;
@@ -555,8 +489,8 @@
       flex: none;
     }
     .m-stage-icon svg {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
     }
     .m-stage-info {
       display: flex;
@@ -572,17 +506,17 @@
     }
     .m-stage-title {
       font-family: 'Baloo 2', sans-serif;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--ink);
       margin: 0;
       line-height: 1.25;
     }
     .m-stage-desc {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--ink-soft);
       margin: 2px 0 0;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .compare{padding:44px 0;}
@@ -652,30 +586,12 @@
         </a>
       </div>
 
-      <div class="hero-scroll-hint">
-        <span>Scroll to see step-by-step flow</span>
-        <svg class="bounce-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- Equation Scroll Track Section -->
-  <div class="eq-scroll-section" id="how-it-works-hero">
-    <div class="eq-sticky-box">
-      <div class="wrap">
-        <div class="eq-badge-wrap">
-          <span class="eq-badge">HOW IT WORKS</span>
-          <span class="eq-badge-step" id="eqBadgeStep">STEP 1 OF 4</span>
-        </div>
-        <div class="eq-progress-bar">
-          <div class="eq-progress-fill" id="eqProgressFill"></div>
-        </div>
-
-        <!-- Desktop Equation Row -->
-        <div class="equation-desktop">
-          <div class="eq-card-item active" data-step="0">
+      <!-- DESKTOP / TABLET EQUATION (Former Design Restored 100%) -->
+      <div class="equation-container">
+        <div class="equation">
+          <div class="eq-card">
             <div class="eq-icon">
-              <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="currentColor" stroke-width="1.8"/></svg>
+              <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 1</span>
@@ -683,11 +599,11 @@
             </div>
           </div>
 
-          <div class="eq-op-item" data-op="0">+</div>
+          <div class="eq-op">+</div>
 
-          <div class="eq-card-item" data-step="1">
+          <div class="eq-card">
             <div class="eq-icon">
-              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><text x="12" y="16.5" font-size="11" font-weight="700" fill="currentColor" text-anchor="middle" font-family="Inter">₦</text></svg>
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0052FE" stroke-width="1.8"/><text x="12" y="16.5" font-size="11" font-weight="700" fill="#0052FE" text-anchor="middle" font-family="Inter">₦</text></svg>
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 2</span>
@@ -695,11 +611,11 @@
             </div>
           </div>
 
-          <div class="eq-op-item" data-op="1">+</div>
+          <div class="eq-op">+</div>
 
-          <div class="eq-card-item" data-step="2">
+          <div class="eq-card">
             <div class="eq-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="currentColor" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" stroke="currentColor" stroke-width="1.8"/></svg>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#0052FE" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="#0052FE" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#0052FE" stroke-width="1.8"/></svg>
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 3</span>
@@ -707,11 +623,11 @@
             </div>
           </div>
 
-          <div class="eq-op-item" data-op="2">+</div>
+          <div class="eq-op">+</div>
 
-          <div class="eq-card-item" data-step="3">
+          <div class="eq-card">
             <div class="eq-icon">
-              <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><line x1="15" y1="15.5" x2="20" y2="15.5" stroke="currentColor" stroke-width="1.8"/><line x1="15" y1="19" x2="20" y2="19" stroke="currentColor" stroke-width="1.8"/></svg>
+              <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="15.5" x2="20" y2="15.5" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="19" x2="20" y2="19" stroke="#0052FE" stroke-width="1.8"/></svg>
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 4</span>
@@ -719,11 +635,11 @@
             </div>
           </div>
 
-          <div class="eq-op-item" data-op="3">=</div>
+          <div class="eq-op">=</div>
 
-          <div class="eq-card-item result-card" data-step="4">
+          <div class="eq-result">
             <div class="eq-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#0052FE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div class="eq-info">
               <span class="eq-step">Result</span>
@@ -731,29 +647,36 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Mobile Equation Stage -->
-        <div class="equation-mobile">
-          <div class="m-step-tabs">
-            <button class="m-tab active" data-mstep="0">Step 1</button>
-            <button class="m-tab" data-mstep="1">Step 2</button>
-            <button class="m-tab" data-mstep="2">Step 3</button>
-            <button class="m-tab" data-mstep="3">Step 4</button>
-            <button class="m-tab" data-mstep="4">= Result</button>
+      <!-- MOBILE ONLY COMPACT STEPPER (No Extended Blue Height) -->
+      <div class="equation-mobile">
+        <div class="eq-badge-wrap">
+          <span class="eq-badge">HOW IT WORKS</span>
+          <span class="eq-badge-step" id="eqBadgeStep">STEP 1 OF 4</span>
+        </div>
+        <div class="eq-progress-bar">
+          <div class="eq-progress-fill" id="eqProgressFill"></div>
+        </div>
+        <div class="m-step-tabs">
+          <button class="m-tab active" data-mstep="0">Step 1</button>
+          <button class="m-tab" data-mstep="1">Step 2</button>
+          <button class="m-tab" data-mstep="2">Step 3</button>
+          <button class="m-tab" data-mstep="3">Step 4</button>
+          <button class="m-tab" data-mstep="4">= Result</button>
+        </div>
+        <div class="m-stage-card" id="mStageCard">
+          <div class="m-stage-icon" id="mStageIcon">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>
           </div>
-          <div class="m-stage-card" id="mStageCard">
-            <div class="m-stage-icon" id="mStageIcon">
-              <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>
-            </div>
-            <div class="m-stage-info">
-              <span class="m-stage-tag" id="mStageTag">STEP 1 OF 4</span>
-              <h3 class="m-stage-title" id="mStageTitle">Matric Signup + NIN</h3>
-              <p class="m-stage-desc" id="mStageDesc">Enter matric number &amp; NIN to create account and set 4-digit PIN in under 60s.</p>
-            </div>
+          <div class="m-stage-info">
+            <span class="m-stage-tag" id="mStageTag">STEP 1 OF 4</span>
+            <h3 class="m-stage-title" id="mStageTitle">Matric Signup + NIN</h3>
+            <p class="m-stage-desc" id="mStageDesc">Enter matric number &amp; NIN to create account and set 4-digit PIN in under 60s.</p>
           </div>
         </div>
-
       </div>
+
     </div>
   </div>
 </div>
@@ -966,11 +889,8 @@
       }
     ];
 
-    const eqSection = document.getElementById('how-it-works-hero');
     const fillBar = document.getElementById('eqProgressFill');
     const eqBadgeStep = document.getElementById('eqBadgeStep');
-    const desktopCards = document.querySelectorAll('.eq-card-item');
-    const desktopOps = document.querySelectorAll('.eq-op-item');
     const mobileTabs = document.querySelectorAll('.m-tab');
 
     const mIcon = document.getElementById('mStageIcon');
@@ -978,13 +898,12 @@
     const mTitle = document.getElementById('mStageTitle');
     const mDesc = document.getElementById('mStageDesc');
 
-    let currentStep = -1;
+    let currentStep = 0;
+    let autoRotateTimer = null;
 
     function updateStepUI(stepIndex) {
-      if (currentStep === stepIndex) return;
       currentStep = stepIndex;
 
-      // Update fill bar
       const percentage = Math.min(100, Math.max(20, (stepIndex + 1) * 20));
       if (fillBar) fillBar.style.width = percentage + '%';
 
@@ -992,24 +911,6 @@
         eqBadgeStep.textContent = stepsData[stepIndex].tag;
       }
 
-      // Desktop cards highlight
-      desktopCards.forEach((card, idx) => {
-        if (idx <= stepIndex) {
-          card.classList.add('active');
-        } else {
-          card.classList.remove('active');
-        }
-      });
-
-      desktopOps.forEach((op, idx) => {
-        if (idx < stepIndex) {
-          op.classList.add('active');
-        } else {
-          op.classList.remove('active');
-        }
-      });
-
-      // Mobile UI
       mobileTabs.forEach((tab, idx) => {
         if (idx === stepIndex) {
           tab.classList.add('active');
@@ -1027,34 +928,42 @@
       }
     }
 
-    function onScroll() {
-      if (!eqSection) return;
-      const rect = eqSection.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      const totalScrollable = rect.height - windowHeight;
-      if (totalScrollable <= 0) return;
-
-      const currentScroll = -rect.top;
-      let progress = currentScroll / totalScrollable;
-      progress = Math.max(0, Math.min(1, progress));
-
-      let stepIndex = Math.floor(progress * 5);
-      if (stepIndex >= 5) stepIndex = 4;
-
-      updateStepUI(stepIndex);
+    function startAutoRotate() {
+      if (autoRotateTimer) clearInterval(autoRotateTimer);
+      autoRotateTimer = setInterval(() => {
+        let nextStep = (currentStep + 1) % stepsData.length;
+        updateStepUI(nextStep);
+      }, 3500);
     }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
 
     mobileTabs.forEach((tab, idx) => {
       tab.addEventListener('click', function() {
         updateStepUI(idx);
+        startAutoRotate(); // Reset auto timer on user tap
       });
     });
 
-    onScroll();
+    // Sync step card gently as user scrolls through mobile hero
+    function onScroll() {
+      if (window.innerWidth > 768) return;
+      const hero = document.querySelector('.hero');
+      if (!hero) return;
+      const rect = hero.getBoundingClientRect();
+      const heroHeight = rect.height;
+      if (heroHeight <= 0) return;
+
+      // Scroll progress through hero
+      const scrollPos = -rect.top;
+      if (scrollPos >= 0 && scrollPos <= heroHeight) {
+        let progress = scrollPos / heroHeight;
+        let stepIdx = Math.min(4, Math.floor(progress * 5));
+        updateStepUI(stepIdx);
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    updateStepUI(0);
+    startAutoRotate();
   })();
 </script>
 </body>
