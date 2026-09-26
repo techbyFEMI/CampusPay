@@ -373,18 +373,35 @@
     .backdrop{
       min-height:auto;
       height:auto;
-      padding-bottom:28px;
+      padding-bottom:0;
+      overflow:visible;
     }
-    header{padding:16px 0 0;}
+    .mobile-hero-track {
+      position: relative;
+      height: 175vh;
+    }
+    .hero-sticky-content {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    header{padding:12px 0 0;}
     .logo-word{font-size:20px;}
     .logo-mark{width:32px;height:32px;}
     .nav-link{display:none;}
     .nav-btn{padding:8px 16px;font-size:13.5px;}
-    .hero{padding:20px 0 20px;}
-    h1{font-size:clamp(28px, 7.5vw, 40px);margin-bottom:14px;letter-spacing:-0.8px;line-height:1.15;}
-    .hero-sub{font-size:15px;line-height:1.55;margin-bottom:24px;max-width:100%;}
-    .hero-ctas{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:20px;width:100%;}
-    .btn, .btn-outline{width:100%;justify-content:center;padding:13px 20px;font-size:15.5px;white-space:normal;}
+    .hero{padding:10px 0 12px;display:flex;flex-direction:column;justify-content:space-between;flex:1;}
+    h1{font-size:clamp(25px, 6.8vw, 36px);margin-bottom:8px;letter-spacing:-0.8px;line-height:1.15;}
+    .hero-sub{font-size:13.5px;line-height:1.45;margin-bottom:14px;max-width:100%;}
+    .hero-ctas{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:12px;width:100%;}
+    .btn, .btn-outline{width:100%;justify-content:center;padding:11px 18px;font-size:14.5px;white-space:normal;}
     
     .equation-container {
       display: none;
@@ -394,42 +411,42 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      margin-top: 14px;
+      margin-top: 6px;
     }
     .eq-badge-wrap {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 6px;
     }
     .eq-badge {
       background: rgba(255,255,255,0.15);
       border: 1px solid rgba(255,255,255,0.25);
       color: var(--white);
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 800;
       letter-spacing: 1px;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 20px;
     }
     .eq-badge-step {
       background: var(--yellow);
       color: var(--navy);
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.5px;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 20px;
       transition: all 0.3s;
     }
     .eq-progress-bar {
       width: 100%;
       max-width: 340px;
-      height: 3.5px;
+      height: 3px;
       background: rgba(255,255,255,0.18);
       border-radius: 4px;
-      margin: 0 auto 12px;
+      margin: 0 auto 8px;
       overflow: hidden;
     }
     .eq-progress-fill {
@@ -442,19 +459,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 5px;
-      margin-bottom: 12px;
+      gap: 2px;
+      margin-bottom: 8px;
       width: 100%;
     }
     .m-tab {
       flex: 1;
-      padding: 7px 4px;
-      border-radius: 10px;
+      padding: 6px 2px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: rgba(255, 255, 255, 0.75);
       font-family: 'Baloo 2', sans-serif;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
@@ -467,21 +484,35 @@
       border-color: var(--white);
       box-shadow: 0 4px 14px rgba(0,0,0,0.18);
     }
+    .m-tab-op {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.4);
+      transition: all 0.25s ease;
+      flex: none;
+      padding: 0 1px;
+    }
+    .m-tab-op.active {
+      color: var(--yellow);
+      transform: scale(1.25);
+      text-shadow: 0 0 8px rgba(255, 237, 3, 0.7);
+    }
     .m-stage-card {
       background: var(--white);
-      border-radius: 18px;
-      padding: 16px 18px;
+      border-radius: 16px;
+      padding: 14px 16px;
       width: 100%;
       box-shadow: 0 12px 32px rgba(0,0,0,0.2);
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       transition: all 0.3s ease;
     }
     .m-stage-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
       background: #EEF2FF;
       display: flex;
       align-items: center;
@@ -489,16 +520,16 @@
       flex: none;
     }
     .m-stage-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
     .m-stage-info {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
     .m-stage-tag {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 800;
       color: var(--blue);
       letter-spacing: 0.5px;
@@ -506,17 +537,17 @@
     }
     .m-stage-title {
       font-family: 'Baloo 2', sans-serif;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--ink);
       margin: 0;
-      line-height: 1.25;
+      line-height: 1.2;
     }
     .m-stage-desc {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--ink-soft);
-      margin: 2px 0 0;
-      line-height: 1.35;
+      margin: 1px 0 0;
+      line-height: 1.3;
     }
 
     .compare{padding:44px 0;}
@@ -552,7 +583,9 @@
 
 <!-- ==================== HERO SECTION ==================== -->
 <div class="backdrop">
-  <div class="wrap">
+  <div class="mobile-hero-track">
+    <div class="hero-sticky-content">
+      <div class="wrap">
     <header>
       <a href="#" class="logo">
         <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
@@ -660,10 +693,14 @@
         </div>
         <div class="m-step-tabs">
           <button class="m-tab active" data-mstep="0">Step 1</button>
+          <span class="m-tab-op active" data-mop="0">+</span>
           <button class="m-tab" data-mstep="1">Step 2</button>
+          <span class="m-tab-op" data-mop="1">+</span>
           <button class="m-tab" data-mstep="2">Step 3</button>
+          <span class="m-tab-op" data-mop="2">+</span>
           <button class="m-tab" data-mstep="3">Step 4</button>
-          <button class="m-tab" data-mstep="4">= Result</button>
+          <span class="m-tab-op" data-mop="3">=</span>
+          <button class="m-tab" data-mstep="4">Result</button>
         </div>
         <div class="m-stage-card" id="mStageCard">
           <div class="m-stage-icon" id="mStageIcon">
@@ -677,6 +714,8 @@
         </div>
       </div>
 
+    </div>
+  </div>
     </div>
   </div>
 </div>
@@ -919,6 +958,15 @@
         }
       });
 
+      const mobileOps = document.querySelectorAll('.m-tab-op');
+      mobileOps.forEach((op, idx) => {
+        if (idx < stepIndex) {
+          op.classList.add('active');
+        } else {
+          op.classList.remove('active');
+        }
+      });
+
       if (mIcon && mTag && mTitle && mDesc) {
         const data = stepsData[stepIndex];
         mIcon.innerHTML = data.icon;
@@ -928,42 +976,31 @@
       }
     }
 
-    function startAutoRotate() {
-      if (autoRotateTimer) clearInterval(autoRotateTimer);
-      autoRotateTimer = setInterval(() => {
-        let nextStep = (currentStep + 1) % stepsData.length;
-        updateStepUI(nextStep);
-      }, 3500);
-    }
-
     mobileTabs.forEach((tab, idx) => {
       tab.addEventListener('click', function() {
         updateStepUI(idx);
-        startAutoRotate(); // Reset auto timer on user tap
       });
     });
 
-    // Sync step card gently as user scrolls through mobile hero
     function onScroll() {
       if (window.innerWidth > 768) return;
-      const hero = document.querySelector('.hero');
-      if (!hero) return;
-      const rect = hero.getBoundingClientRect();
-      const heroHeight = rect.height;
-      if (heroHeight <= 0) return;
+      const track = document.querySelector('.mobile-hero-track');
+      if (!track) return;
+      const rect = track.getBoundingClientRect();
+      const totalScrollable = rect.height - window.innerHeight;
+      if (totalScrollable <= 0) return;
 
-      // Scroll progress through hero
-      const scrollPos = -rect.top;
-      if (scrollPos >= 0 && scrollPos <= heroHeight) {
-        let progress = scrollPos / heroHeight;
-        let stepIdx = Math.min(4, Math.floor(progress * 5));
-        updateStepUI(stepIdx);
-      }
+      const currentScroll = -rect.top;
+      let progress = currentScroll / totalScrollable;
+      progress = Math.max(0, Math.min(1, progress));
+
+      let stepIdx = Math.min(4, Math.floor(progress * 5));
+      updateStepUI(stepIdx);
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
     updateStepUI(0);
-    startAutoRotate();
   })();
 </script>
 </body>
