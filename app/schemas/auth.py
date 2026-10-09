@@ -63,6 +63,22 @@ class LoginMatricRequest(BaseModel):
     password: str
 
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    phone: str | None = None
+
+
+class RefreshSessionRequest(BaseModel):
+    refresh_token: str
+
+
 class RosterRow(BaseModel):
     matric_number: str
     full_name: str

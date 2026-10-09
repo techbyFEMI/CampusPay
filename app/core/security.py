@@ -1,90 +1,83 @@
-
-import logging
 import jwt
-from fastapi import HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt import PyJWKClient
+
 from app.core.config import settings
 
-logger = logging.getLogger(__name__)
-bearer_schema = HTTPBearer()
 
-# Lazy optional Firebase init for backwards compatibility during migration
-_firebase_initialized = False
-def _init_firebase_if_configured():
-    global _firebase_initialized
-    if _firebase_initialized:
-        return True
-    if settings.FIREBASE_CREDENTIALS:
-        try:
-            import json
-            import firebase_admin
-            from firebase_admin import credentials
-            creds_dict = json.loads(settings.FIREBASE_CREDENTIALS)
-            firebase_creds = credentials.Certificate(creds_dict)
-            firebase_admin.initialize_app(firebase_creds)
-            _firebase_initialized = True
-            return True
-        except Exception as e:
-            logger.warning("Firebase init skipped/failed: %s", e)
-    return False
+bearer_schema = HTTPBearer(auto_error=False)
+_jwks_client: PyJWKClient | None = None
+
+
+def _get_jwks_client() -> PyJWKClient:
+    global _jwks_client
+    if not settings.SUPABASE_URL:
+        raise RuntimeError("SUPABASE_URL is required to verify Supabase access tokens")
+    if _jwks_client is None:
+        jwks_url = f"{settings.SUPABASE_URL.rstrip('/')}/auth/v1/.well-known/jwks.json"
+        _jwks_client = PyJWKClient(jwks_url, cache_keys=True)
+    return _jwks_client
 
 
 def verify_supabase_token(token: str) -> dict:
-    """Verify Supabase JWT using SUPABASE_JWT_SECRET (or SECRET_KEY fallback)."""
-    secret = settings.SUPABASE_JWT_SECRET or settings.SECRET_KEY
+    """Verify an access token issued by Supabase Auth and return its stable subject."""
+    if not settings.SUPABASE_URL:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Supabase Auth is not configured.",
+        )
     try:
+        header = jwt.get_unverified_header(token)
+        algorithm = header.get("alg")
+        if algorithm == "HS256":
+            # Legacy Supabase projects can still issue HS256 tokens. Never fall back
+            # to the application's general-purpose SECRET_KEY.
+            if not settings.SUPABASE_JWT_SECRET:
+                raise ValueError("SUPABASE_JWT_SECRET is required for legacy HS256 tokens")
+            verification_key = settings.SUPABASE_JWT_SECRET
+        elif algorithm in {"RS256", "ES256", "ES384"}:
+            verification_key = _get_jwks_client().get_signing_key_from_jwt(token).key
+        else:
+            raise ValueError("Unsupported Supabase JWT signing algorithm")
+
+        issuer = f"{settings.SUPABASE_URL.rstrip('/')}/auth/v1"
         payload = jwt.decode(
             token,
-            secret,
-            algorithms=["HS256"],
-            options={"verify_aud": False},
+            verification_key,
+            algorithms=[algorithm],
+            audience="authenticated",
+            issuer=issuer,
+            options={"require": ["exp", "iat", "sub", "role"]},
         )
-        user_id = payload.get("sub")
-        if not user_id:
-            raise ValueError("Token missing 'sub' claim")
+        if payload.get("role") != "authenticated":
+            raise ValueError("Token is not an authenticated-user access token")
 
-        app_meta = payload.get("app_metadata", {})
-        user_meta = payload.get("user_metadata", {})
-
+        user_id = payload["sub"]
         return {
             "uid": user_id,
             "user_id": user_id,
             "sub": user_id,
             "email": payload.get("email"),
-            "role": app_meta.get("role") or user_meta.get("role"),
             "claims": payload,
-            "user_metadata": user_meta,
-            "app_metadata": app_meta,
+            "user_metadata": payload.get("user_metadata", {}),
+            "app_metadata": payload.get("app_metadata", {}),
         }
     except Exception as exc:
-        # Fallback to Firebase if Firebase is configured
-        if _init_firebase_if_configured():
-            try:
-                from firebase_admin import auth
-                decoded_token = auth.verify_id_token(token)
-                return decoded_token
-            except Exception:
-                pass
-
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials or expired token.",
+            detail="Invalid Supabase access token or expired session.",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
 
-def verify_firebase_token(token: str) -> dict:
-    """Delegates to verify_supabase_token for seamless migration."""
-    return verify_supabase_token(token)
-
-
-def get_current_user(creds: HTTPAuthorizationCredentials = Depends(bearer_schema)) -> dict:
-    return verify_supabase_token(creds.credentials)
-
-
-# Backwards compatible alias for existing routes
-get_current_firebase_user = get_current_user
-
- 
-
-
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_schema),
+) -> dict:
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return verify_supabase_token(credentials.credentials)

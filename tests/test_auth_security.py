@@ -1,57 +1,74 @@
+import time
+
+import jwt
 import pytest
-from unittest.mock import patch
 from fastapi import HTTPException, status
 from fastapi.testclient import TestClient
 
+from app.core.rate_limiter import SimpleRateLimiter
+from app.core.security import verify_supabase_token
 from main import app
-from app.core.security import verify_firebase_token
-from app.core.rate_limiter import SimpleRateLimiter, login_rate_limiter, order_rate_limiter, scan_rate_limiter
 
 
-def test_jwt_signature_bypass_removed():
-    """Verify that unverified JWT tokens are strictly rejected and no fallback occurs."""
-    invalid_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhdHRhY2tlcl91aWQiLCJyb2xlIjoiQWRtaW4ifQ.fake_signature"  # pragma: allowlist secret
+def test_supabase_rejects_invalid_access_token(monkeypatch):
+    monkeypatch.setattr("app.core.config.settings.SUPABASE_URL", "https://project.supabase.co")
+    monkeypatch.setattr(
+        "app.core.config.settings.SUPABASE_JWT_SECRET",
+        "test-supabase-jwt-secret-with-safe-length",
+    )
 
-    
     with pytest.raises(HTTPException) as exc_info:
-        verify_firebase_token(invalid_token)
-    
+        verify_supabase_token("not-a-valid-jwt")
+
     assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
-    assert "Invalid authentication credentials" in exc_info.value.detail
+
+
+def test_supabase_rejects_wrong_signature(monkeypatch):
+    monkeypatch.setattr("app.core.config.settings.SUPABASE_URL", "https://project.supabase.co")
+    monkeypatch.setattr(
+        "app.core.config.settings.SUPABASE_JWT_SECRET",
+        "expected-supabase-jwt-secret-with-safe-length",
+    )
+    token = jwt.encode(
+        {
+            "sub": "student-id",
+            "role": "authenticated",
+            "aud": "authenticated",
+            "iss": "https://project.supabase.co/auth/v1",
+            "iat": int(time.time()),
+            "exp": int(time.time()) + 300,
+        },
+        "different-supabase-jwt-secret-with-safe-length",
+        algorithm="HS256",
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        verify_supabase_token(token)
+
+    assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_rate_limiter_exceeded():
-    """Verify rate limiter throws HTTP 429 Too Many Requests."""
     limiter = SimpleRateLimiter(requests_per_minute=2)
-    
+
     class MockClient:
         host = "127.0.0.1"
-    
+
     class MockRequest:
         client = MockClient()
-    
-    req = MockRequest()
-    
-    # 1st & 2nd request succeed
-    limiter(req)
-    limiter(req)
-    
-    # 3rd request triggers 429
+
+    request = MockRequest()
+    limiter(request)
+    limiter(request)
+
     with pytest.raises(HTTPException) as exc_info:
-        limiter(req)
-    
+        limiter(request)
+
     assert exc_info.value.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
 
-def test_unauthenticated_protected_endpoint():
-    """Verify protected endpoints return HTTP 401 when no token is supplied."""
+def test_unauthenticated_protected_endpoints_return_401():
     client = TestClient(app)
-    
-    # Wallet endpoint requires auth
-    res = client.get("/api/wallet")
-    assert res.status_code in (401, 403)
 
-    # Profile endpoint requires auth
-    res = client.get("/api/profile")
-    assert res.status_code in (401, 403)
-
+    assert client.get("/api/wallet").status_code == status.HTTP_401_UNAUTHORIZED
+    assert client.get("/api/profile").status_code == status.HTTP_401_UNAUTHORIZED

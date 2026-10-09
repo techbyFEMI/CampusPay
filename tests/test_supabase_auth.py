@@ -9,12 +9,17 @@ from app.core.security import verify_supabase_token, get_current_user
 def test_supabase_jwt_verification(monkeypatch):
     test_secret = "test_supabase_jwt_secret_key_12345"  # pragma: allowlist secret
     monkeypatch.setattr("app.core.config.settings.SUPABASE_JWT_SECRET", test_secret)
-
+    project_url = "https://project.supabase.co"
+    monkeypatch.setattr("app.core.config.settings.SUPABASE_URL", project_url)
 
     now = datetime.now(timezone.utc)
     payload = {
         "sub": "usr_supabase_uuid_12345",
         "email": "student@campuspay.edu",
+        "role": "authenticated",
+        "aud": "authenticated",
+        "iss": f"{project_url}/auth/v1",
+        "iat": int(now.timestamp()),
         "exp": int((now + timedelta(hours=1)).timestamp()),
         "app_metadata": {"role": "Student"},
         "user_metadata": {"full_name": "Test Student"},
@@ -24,18 +29,25 @@ def test_supabase_jwt_verification(monkeypatch):
 
     user = verify_supabase_token(token)
     assert user["uid"] == "usr_supabase_uuid_12345"
+    assert user["user_id"] == "usr_supabase_uuid_12345"
     assert user["email"] == "student@campuspay.edu"
-    assert user["role"] == "Student"
+    assert user["claims"]["app_metadata"]["role"] == "Student"
+    assert "role" not in user
 
 
 def test_supabase_expired_jwt(monkeypatch):
     test_secret = "test_supabase_jwt_secret_key_12345"  # pragma: allowlist secret
     monkeypatch.setattr("app.core.config.settings.SUPABASE_JWT_SECRET", test_secret)
-
+    project_url = "https://project.supabase.co"
+    monkeypatch.setattr("app.core.config.settings.SUPABASE_URL", project_url)
 
     past = datetime.now(timezone.utc) - timedelta(hours=1)
     payload = {
         "sub": "usr_supabase_uuid_12345",
+        "role": "authenticated",
+        "aud": "authenticated",
+        "iss": f"{project_url}/auth/v1",
+        "iat": int(past.timestamp()),
         "email": "student@campuspay.edu",
         "exp": int(past.timestamp()),
     }
