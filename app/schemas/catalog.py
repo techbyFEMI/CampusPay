@@ -1,11 +1,9 @@
 from pydantic import BaseModel, field_validator
-from decimal import Decimal
 from datetime import datetime
 
 
-class VendorSummary(BaseModel):
-    
-    vendor_id: str
+class RepSummary(BaseModel):
+    rep_id: str
     name: str
     location: str | None
     phone: str | None
@@ -20,16 +18,15 @@ class ProductItem(BaseModel):
     product_id: str
     name: str
     description: str | None
-    price: Decimal
+    price_kobo: int
     is_available: bool
     image_url: str | None = None
 
     model_config = {"from_attributes": True}
 
 
-class VendorDetail(BaseModel):
-    
-    vendor_id: str
+class RepDetail(BaseModel):
+    rep_id: str
     name: str
     location: str | None
     phone: str | None
@@ -46,7 +43,7 @@ from pydantic import BaseModel, Field, field_validator
 class ProductCreateRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=1000)
-    price: Decimal
+    price_kobo: int
     image_url: str | None = Field(default=None, max_length=500)
 
     @field_validator("name", "description", mode="before")
@@ -57,9 +54,9 @@ class ProductCreateRequest(BaseModel):
             return v if v else None
         return v
 
-    @field_validator("price")
+    @field_validator("price_kobo")
     @classmethod
-    def validate_price(cls, v: Decimal) -> Decimal:
+    def validate_price(cls, v: int) -> int:
         if v <= 0:
             raise ValueError("Price must be greater than zero")
         return v
@@ -68,7 +65,7 @@ class ProductCreateRequest(BaseModel):
 class ProductUpdateRequest(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=1000)
-    price: Decimal | None = None
+    price_kobo: int | None = None
     is_available: bool | None = None
     image_url: str | None = Field(default=None, max_length=500)
 
@@ -80,9 +77,9 @@ class ProductUpdateRequest(BaseModel):
             return v if v else None
         return v
 
-    @field_validator("price")
+    @field_validator("price_kobo")
     @classmethod
-    def validate_price(cls, v: Decimal | None) -> Decimal | None:
+    def validate_price(cls, v: int | None) -> int | None:
         if v is not None and v <= 0:
             raise ValueError("Price must be greater than zero")
         return v
@@ -91,10 +88,10 @@ class ProductUpdateRequest(BaseModel):
 
 class ProductResponse(BaseModel):
     product_id: str
-    vendor_id: str
+    rep_id: str
     name: str
     description: str | None
-    price: Decimal
+    price_kobo: int
     is_available: bool
     image_url: str | None = None
     created_at: datetime
