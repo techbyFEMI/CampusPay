@@ -1,189 +1,181 @@
-
+import hashlib
 import json
 import logging
-from decimal import Decimal
 from datetime import datetime, timezone
 
-from fastapi import Request, Depends, APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security_webhook import verify_nomba_signature
-from app.models.models import webhook_events, accounts, wallets, hookstate, wallet_ledger
+from app.core.security_webhook import verify_paystack_signature
+from app.models.models import (
+    Journal,
+    JournalEntry,
+    LedgerAccount,
+    TransferAttempt,
+    accounttype,
+    accounts,
+    entrytype,
+    hookstate,
+    orders,
+    paymentstat,
+    transferattemptstat,
+    wallets,
+    webhook_events,
+)
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post("/webhook/nomba")
-async def nomba_webhook(request: Request, db: AsyncSession = Depends(get_db)):
+@router.post("/webhook/paystack")
+async def paystack_webhook(request: Request, db: AsyncSession = Depends(get_db)):
+    raw_body = await request.body()
+    signature = request.headers.get("x-paystack-signature")
+    if not verify_paystack_signature(raw_body, signature):
+        raise HTTPException(status_code=401, detail="Invalid Paystack signature")
     try:
-        raw_body = await request.body()
+        payload = json.loads(raw_body)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=400, detail="Malformed JSON payload") from exc
 
+    event_type = payload.get("event", "unknown")
+    data = payload.get("data") or {}
+    provider_event_id = str(data.get("reference") or data.get("id") or hashlib.sha256(raw_body).hexdigest())
+    event_id = f"{event_type}:{provider_event_id}"
+    event = webhook_events(
+        event_id=event_id,
+        provider="paystack",
+        event_type=event_type,
+        status=hookstate.processed,
+        raw_payload=payload,
+    )
+    db.add(event)
 
-        signature = (
-            request.headers.get("nomba-signature")
-            or request.headers.get("nomba-sig-value")
-            or ""
-        )
-        timestamp = request.headers.get("nomba-timestamp") or ""
+    if event_type == "charge.success":
+        customer = data.get("customer") or {}
+        customer_code = customer.get("customer_code")
+        amount_kobo = data.get("amount")
+        if not customer_code or not isinstance(amount_kobo, int) or amount_kobo <= 0:
+            await db.rollback()
+            raise HTTPException(status_code=400, detail="Malformed Paystack charge event")
 
-        if not signature or not timestamp:
-            logger.warning(
-                "webhook_missing_signature headers=%s",
-                dict(request.headers),
-            )
-            raise HTTPException(status_code=400, detail="Missing signature or timestamp")
-
-        is_valid = verify_nomba_signature(raw_body.decode(), signature, timestamp)
-        if not is_valid:
-            logger.warning("webhook_invalid_signature received=%s", signature[:20])
-            raise HTTPException(status_code=401, detail="Invalid webhook signature")
-
-        
-        try:
-            payload = json.loads(raw_body.decode())
-        except json.JSONDecodeError:
-            logger.error("webhook_malformed_json body=%s", raw_body[:200])
-            raise HTTPException(status_code=400, detail="Malformed JSON payload")
-
-        
-        event_id = payload.get("requestId") or payload.get("request_id")
-        if not event_id:
-            logger.error("webhook_missing_request_id payload=%s", str(payload)[:300])
-            raise HTTPException(status_code=400, detail="Missing requestId — cannot guarantee idempotency")
-
-        event_type = payload.get("event_type", "unknown")
-
-        logger.info(
-            "webhook_received",
-            extra={"event_id": event_id, "event_type": event_type},
-        )
-
-       
-        if event_type != "payment_success":
-            logger.info(
-                "webhook_unhandled_event event_id=%s event_type=%s",
-                event_id,
-                event_type,
-            )
-           
-            await _store_unhandled_event(db, event_id, event_type, payload)
-            return JSONResponse(content={"message": f"Event type '{event_type}' acknowledged"}, status_code=200)
-
-        
-        try:
-            transaction_data = payload["data"]["transaction"]
-            account_reference = transaction_data["aliasAccountReference"]
-            amount = transaction_data["transactionAmount"]
-        except KeyError as e:
-            logger.error("webhook_malformed_payload missing_field=%s event_id=%s", e, event_id)
-            raise HTTPException(status_code=400, detail=f"Malformed webhook payload: missing {e}")
-
-        
         dva_result = await db.execute(
-            select(accounts).where(accounts.account_reference == account_reference)
+            select(accounts).where(accounts.provider_customer_code == customer_code)
         )
         dva = dva_result.scalar_one_or_none()
-        if not dva:
-            logger.warning("webhook_unknown_account_reference ref=%s event_id=%s", account_reference, event_id)
-            return JSONResponse(content={"message": "Account reference not found"}, status_code=200)
+        if dva:
+            wallet_result = await db.execute(
+                select(wallets).where(wallets.user_id == dva.owner_user_id).with_for_update()
+            )
+            wallet = wallet_result.scalar_one_or_none()
+            if wallet is None:
+                await db.rollback()
+                raise HTTPException(status_code=409, detail="Wallet not provisioned for this DVA")
 
-        wallet_result = await db.execute(
-            select(wallets).where(wallets.user_id == dva.student_id)
+            student_account_result = await db.execute(
+                select(LedgerAccount).where(
+                    LedgerAccount.user_id == dva.owner_user_id,
+                    LedgerAccount.account_type == accounttype.student_wallet,
+                    LedgerAccount.currency == "NGN",
+                )
+            )
+            student_account = student_account_result.scalar_one_or_none()
+            if student_account is None:
+                student_account = LedgerAccount(
+                    account_type=accounttype.student_wallet,
+                    user_id=dva.owner_user_id,
+                    currency="NGN",
+                    balance_kobo=0,
+                )
+                db.add(student_account)
+                await db.flush()
+
+            provider_account_result = await db.execute(
+                select(LedgerAccount).where(
+                    LedgerAccount.account_type == accounttype.external_paystack,
+                    LedgerAccount.user_id.is_(None),
+                    LedgerAccount.currency == "NGN",
+                )
+            )
+            provider_account = provider_account_result.scalar_one_or_none()
+            if provider_account is None:
+                provider_account = LedgerAccount(
+                    account_type=accounttype.external_paystack,
+                    user_id=None,
+                    currency="NGN",
+                    balance_kobo=0,
+                )
+                db.add(provider_account)
+                await db.flush()
+
+            reference = f"paystack:charge:{provider_event_id}"
+            journal = Journal(reference=reference, reason="student_wallet_funding")
+            db.add(journal)
+            await db.flush()
+            db.add_all(
+                [
+                    JournalEntry(
+                        journal_id=journal.journal_id,
+                        account_id=provider_account.account_id,
+                        entry_type=entrytype.debit,
+                        amount_kobo=amount_kobo,
+                    ),
+                    JournalEntry(
+                        journal_id=journal.journal_id,
+                        account_id=student_account.account_id,
+                        entry_type=entrytype.credit,
+                        amount_kobo=amount_kobo,
+                    ),
+                ]
+            )
+            wallet.balance_kobo += amount_kobo
+            wallet.updated_at = datetime.now(timezone.utc)
+            student_account.balance_kobo += amount_kobo
+            provider_account.balance_kobo += amount_kobo
+        else:
+            logger.warning("Paystack charge has no matching CampusPay DVA customer: %s", customer_code)
+
+    elif event_type in {"transfer.success", "transfer.failed", "transfer.reversed"}:
+        transfer_reference = data.get("reference")
+        attempt_result = await db.execute(
+            select(TransferAttempt)
+            .where(TransferAttempt.provider_reference == transfer_reference)
+            .with_for_update()
         )
-        wallet = wallet_result.scalar_one_or_none()
-        if not wallet:
-            logger.warning("webhook_wallet_not_found student_id=%s event_id=%s", dva.student_id, event_id)
-            return JSONResponse(content={"message": "Wallet not found"}, status_code=200)
+        attempt = attempt_result.scalar_one_or_none()
+        if attempt:
+            order_result = await db.execute(
+                select(orders).where(orders.order_id == attempt.order_id).with_for_update()
+            )
+            order = order_result.scalar_one_or_none()
+            if order and event_type == "transfer.success":
+                attempt.status = transferattemptstat.success
+                order.payment_status = paymentstat.approved
+                provider_cost_kobo = data.get("fees")
+                if isinstance(provider_cost_kobo, int) and provider_cost_kobo >= 0:
+                    order.provider_cost_kobo = provider_cost_kobo
+                    distributable_fee = max(order.fee_kobo - provider_cost_kobo, 0)
+                    order.rep_share_kobo = distributable_fee * 60 // 100
+                    order.campuspay_share_kobo = distributable_fee - order.rep_share_kobo
+            elif order:
+                attempt.status = transferattemptstat.failed
+                attempt.failure_reason = data.get("reason") or event_type
+                if attempt.attempt_number >= 3:
+                    order.payment_status = paymentstat.failed
 
-        
-        credit_amount = Decimal(str(amount))
-        balance_before = wallet.available_balance
-
-        new_event = webhook_events(
-            event_id=event_id,
-            event_type=event_type,
-            account_reference=account_reference,
-            amount=credit_amount,
-            status=hookstate.processed,
-            raw_payload=payload,
-        )
-        db.add(new_event)
-
-        wallet.available_balance += credit_amount
-        wallet.updated_at = datetime.now(timezone.utc)
-
-       
-        ledger_entry = wallet_ledger(
-            wallet_id=wallet.wallet_id,
-            user_id=dva.student_id,
-            direction="credit",
-            amount=credit_amount,
-            balance_before=balance_before,
-            balance_after=wallet.available_balance,
-            reference=event_id,
-            order_id=None,
-            reason="webhook_credit",
-        )
-        db.add(ledger_entry)
-
-        try:
-            await db.commit()
-        except IntegrityError:
-            await db.rollback()
-            logger.info("webhook_duplicate_ignored event_id=%s", event_id)
-            return JSONResponse(content={"message": "Already processed"}, status_code=200)
-
-        logger.info(
-            "webhook_wallet_credited",
-            extra={
-                "event_id": event_id,
-                "student_id": dva.student_id,
-                "amount": str(credit_amount),
-                "balance_before": str(balance_before),
-                "balance_after": str(wallet.available_balance),
-            },
-        )
-        return JSONResponse(content={"message": "Webhook processed"}, status_code=200)
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        await db.rollback()
-        logger.exception("webhook_processing_error error=%s", e)
-        raise HTTPException(status_code=500, detail="Internal Server Error")
-
-
-async def _store_unhandled_event(
-    db: AsyncSession,
-    event_id: str,
-    event_type: str,
-    payload: dict,
-) -> None:
-   
     try:
-        existing = await db.execute(
-            select(webhook_events).where(webhook_events.event_id == event_id)
-        )
-        if existing.scalar_one_or_none():
-            return
-
-        event = webhook_events(
-            event_id=event_id,
-            event_type=event_type,
-            account_reference="",
-            amount=Decimal("0"),
-            status=hookstate.processed,
-            raw_payload=payload,
-        )
-        db.add(event)
         await db.commit()
     except IntegrityError:
         await db.rollback()
-    except Exception as exc:
+        return JSONResponse(content={"message": "Duplicate event acknowledged"}, status_code=200)
+    except Exception:
         await db.rollback()
-        logger.error("webhook_store_unhandled_error event_id=%s error=%s", event_id, exc)
+        logger.exception("Paystack webhook processing failed event_id=%s", event_id)
+        raise HTTPException(status_code=500, detail="Webhook processing failed")
+
+    return JSONResponse(content={"message": "Event acknowledged"}, status_code=200)

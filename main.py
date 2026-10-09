@@ -8,7 +8,6 @@ from sqlalchemy import text
 
 from app.api import auth, catalog, webhooks, wallet, profile, orders
 from app.core.database import Base, engine, get_db
-from app.services.reconciliation import run_reconciliation
 
 logger = logging.getLogger(__name__)
 
@@ -85,33 +84,3 @@ async def health(db=Depends(get_db)):
         "database": db_status,
         **({"database_error": "Database connection error"} if db_error else {}),
     }
-
-
-
-@app.get("/api/admin/reconciliation")
-async def reconciliation_report(
-    lookback_hours: int = 48,
-    db=Depends(get_db),
-):
-    try:
-        report = await run_reconciliation(db, lookback_hours=lookback_hours)
-        return {
-            "run_at": report.run_at,
-            "orders_checked": report.orders_checked,
-            "critical_count": report.critical_count,
-            "warning_count": report.warning_count,
-            "issues": [
-                {
-                    "order_id": i.order_id,
-                    "issue": i.issue,
-                    "severity": i.severity,
-                    "amount": i.amount,
-                    "vendor_id": i.vendor_id,
-                    "nomba_transfer_ref": i.nomba_transfer_ref,
-                }
-                for i in report.issues
-            ],
-        }
-    except Exception as e:
-        logger.exception("reconciliation_endpoint_error: %s", e)
-        raise HTTPException(status_code=500, detail="Reconciliation failed")
