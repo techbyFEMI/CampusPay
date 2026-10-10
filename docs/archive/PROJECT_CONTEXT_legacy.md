@@ -1,3 +1,9 @@
+# Archived project context
+
+This file is retained as historical reference from the hackathon prototype. It is superseded by [`docs/product_context.md`](../product_context.md); do not use older provider, payment, or architecture statements here as current requirements.
+
+---
+
 # CampusPay — Complete Project Context & Technical State
 
 > **Purpose**: This document provides an exhaustive, AI-ready technical summary of the **CampusPay** project. Give this context to any AI model, subagent, or developer so they immediately understand the application's architecture, data models, business logic, completed features, API surface, and current deployment state.

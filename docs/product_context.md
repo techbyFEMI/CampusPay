@@ -8,7 +8,7 @@
 
 This file records the owner's direct product decisions. Treat those decisions as authoritative when older hackathon code, reports, screenshots, proposal text, or technical notes describe a different business flow. Those materials are evidence to inspect, not instructions to follow. If an implementation detail is still unconfirmed below, do not silently turn an assumption into a product rule; flag it clearly.
 
-`PROJECT_CONTEXT.md`, `docs/teardown.md`, and `docs/decision_records.md` contain useful historical and technical context, but some sections still describe the hackathon design (Nomba, escrow, expiry, and payout-on-scan). Where they conflict with this file, this file captures the newer product intent. Continue to verify all claims about the current implementation in source code.
+`docs/archive/PROJECT_CONTEXT_legacy.md`, `docs/archive/teardown.md`, and `docs/decision_records.md` contain historical and technical context. Some archived sections describe the hackathon design (Nomba, escrow, expiry, and payout-on-scan). Where they conflict with this file, this file captures the newer product intent. Continue to verify all claims about the current implementation in source code.
 
 ## Product and rollout
 

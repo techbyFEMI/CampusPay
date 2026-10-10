@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from app.core.rate_limiter import SimpleRateLimiter
 from app.core.security import verify_supabase_token
-from main import app
+from app.main import app
 
 
 def test_supabase_rejects_invalid_access_token(monkeypatch):

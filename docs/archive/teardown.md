@@ -1,3 +1,9 @@
+# Archived teardown report
+
+This report describes the earlier hackathon implementation. It is retained for historical findings; current product decisions are in [`docs/product_context.md`](../product_context.md). Treat technical claims as unverified until checked against the current source.
+
+---
+
 # CampusPay Phase 0: System Teardown & Inventory Audit
 
 > **Document Status**: Complete Read-Only Audit  

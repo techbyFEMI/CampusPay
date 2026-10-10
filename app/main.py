@@ -1,5 +1,4 @@
 import logging
-from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
@@ -7,24 +6,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.api import auth, catalog, webhooks, wallet, profile, orders
-from app.core.database import Base, engine, get_db
+from app.core.database import get_db
 
 logger = logging.getLogger(__name__)
 
 _started_at: datetime = datetime.now(timezone.utc)
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-
-
 app = FastAPI(
     title="CampusPay Course-Rep Pilot Infrastructure",
     version="2.0.0",
-    lifespan=lifespan,
 )
 
 origins = [

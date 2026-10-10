@@ -4,7 +4,7 @@ from pydantic import ValidationError
 from app.schemas.catalog import ProductCreateRequest, ProductUpdateRequest
 from app.schemas.orders import PlaceOrderRequest
 from app.schemas.profile import SetPinRequest
-from main import origins, app
+from app.main import origins, app
 from fastapi.testclient import TestClient
 
 
