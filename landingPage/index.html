@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CampusPay — The Smart Way to Pay & Collect on Campus</title>
-<meta name="description" content="CampusPay gives Nigerian university students a dedicated virtual wallet account and class reps a digital departmental catalog — making campus payments, handout fees, and QR-verified collection effortless.">
+<meta name="description" content="CampusPay helps course reps publish department catalogs, track payments by product, and confirm handout delivery with QR scans.">
 <meta name="theme-color" content="#0052FE">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -256,6 +256,7 @@
   /* ---------- FEATURES ---------- */
   .features-sec{padding:80px 0;background:#F6F8FC;}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  .rep-card{order:-1;}
   .feat-card{
     background:var(--white);border-radius:20px;padding:34px;
     border:1.5px solid var(--line);
@@ -558,14 +559,14 @@
 
       <div class="nav-actions">
         <a href="#how-it-works" class="nav-link">How it Works</a>
-        <a href="#features" class="nav-link">Features</a>
+        <a href="#features" class="nav-link">For Reps</a>
         <a href="/Frontend/index.html" class="nav-btn">Sign In</a>
       </div>
     </header>
 
     <div class="hero">
       <h1>The smart way to pay &amp; collect on campus.</h1>
-      <p class="hero-sub">Dedicated virtual wallet accounts for students. Effortless department dues, handouts &amp; fee collection for class reps. NIN-verified identity for total security.</p>
+      <p class="hero-sub">Publish department items, track paid and outstanding students by product, and confirm handout distribution with QR. Students get a clear catalog and a reliable payment record.</p>
 
       <div class="hero-ctas">
         <a href="/Frontend/index.html" class="btn">
@@ -583,7 +584,7 @@
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 1</span>
-              <span class="eq-title">Matric Verification + NIN</span>
+              <span class="eq-title">Build Department Catalog</span>
             </div>
           </div>
           <div class="eq-op">+</div>
@@ -593,7 +594,7 @@
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 2</span>
-              <span class="eq-title">Fund Wallet</span>
+              <span class="eq-title">Students Pay</span>
             </div>
           </div>
           <div class="eq-op">+</div>
@@ -603,7 +604,7 @@
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 3</span>
-              <span class="eq-title">Select &amp; Pay</span>
+              <span class="eq-title">Track Payment Progress</span>
             </div>
           </div>
           <div class="eq-op">+</div>
@@ -613,7 +614,7 @@
             </div>
             <div class="eq-info">
               <span class="eq-step">Step 4</span>
-              <span class="eq-title">QR Distribution</span>
+              <span class="eq-title">Confirm Delivery by QR</span>
             </div>
           </div>
           <div class="eq-op">=</div>
@@ -623,7 +624,7 @@
             </div>
             <div class="eq-info">
               <span class="eq-step">Result</span>
-              <span class="eq-title">Zero Campus Stress</span>
+              <span class="eq-title">Clear Records. Less Chasing.</span>
             </div>
           </div>
         </div>
@@ -648,8 +649,8 @@
             <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>
           </div>
           <div class="m-stage-info">
-            <h3 class="m-stage-title" id="mStageTitle">Matric Verification + NIN</h3>
-            <p class="m-stage-desc" id="mStageDesc">Enter your matric number &amp; NIN to verify your profile and set your 4-digit security PIN.</p>
+          <h3 class="m-stage-title" id="mStageTitle">Build Department Catalog</h3>
+          <p class="m-stage-desc" id="mStageDesc">List the handouts, manuals, and department items your students need.</p>
           </div>
         </div>
         <div class="m-scroll-hint" id="mScrollHint">
@@ -664,9 +665,9 @@
 <!-- ==================== COMPARE SECTION ==================== -->
 <div class="compare">
   <div class="wrap">
-    <div class="section-label">The Problem We Solve</div>
-    <h2>Why students and class reps switch to CampusPay</h2>
-    <p class="section-sub">No more missing payment receipts, manual bank transfer confirmations, or chasing classmates over WhatsApp.</p>
+    <div class="section-label">Made for Course Reps</div>
+    <h2>Run department collections without the spreadsheet chase.</h2>
+    <p class="section-sub">See payments and outstanding students by product, keep order records together, and confirm handout collection without paper lists.</p>
     <div class="split">
       <div class="panel">
         <div class="panel-label">The Old Way</div>
@@ -695,21 +696,21 @@
 
     <div class="grid-2">
       <!-- STUDENT CARD -->
-      <div class="feat-card">
+      <div class="feat-card student-card">
         <span class="feat-badge">For Students</span>
-        <h3>Effortless Student Payments</h3>
+        <h3>A Clearer Way for Students to Pay</h3>
         <ul class="feat-list">
           <li class="feat-item">
             <div class="feat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             </div>
-            <div><strong>Personal Virtual Account:</strong> Top up your wallet using your unique bank account number via any bank app — GTB, First Bank, OPay, anywhere.</div>
+            <div><strong>Rep-Linked Catalog:</strong> Find the items published for your department by your Course Rep, with clear prices and descriptions.</div>
           </li>
           <li class="feat-item">
             <div class="feat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
-            <div><strong>1-Click Matric Checkout:</strong> Pay for handouts, manuals, or tickets using your matric number and 4-digit PIN — no full login needed.</div>
+            <div><strong>Trackable Purchases:</strong> Pay for a listed item and keep a clear record of your order and payment status.</div>
           </li>
           <li class="feat-item">
             <div class="feat-icon">
@@ -721,27 +722,39 @@
       </div>
 
       <!-- REP CARD -->
-      <div class="feat-card">
+      <div class="feat-card rep-card">
         <span class="feat-badge" style="color:var(--blue-panel);background:#E7EEFF;">For Class Reps & Dept Executives</span>
-        <h3>Automated Store & Collection</h3>
+        <h3>Manage Your Department in One Place</h3>
         <ul class="feat-list">
+          <li class="feat-item">
+            <div class="feat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8M8 17h8"/></svg>
+            </div>
+            <div><strong>Class Roster CSV Upload:</strong> Import your department's matric numbers and names in one file so students can claim their accounts and find their department catalog.</div>
+          </li>
           <li class="feat-item">
             <div class="feat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             </div>
-            <div><strong>Digital Department Catalog:</strong> List handouts, textbooks, and contributions with clear prices, descriptions, and stock levels.</div>
+            <div><strong>Department Catalog:</strong> Publish handouts, manuals, and department items with clear prices and descriptions.</div>
           </li>
           <li class="feat-item">
             <div class="feat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
-            <div><strong>Camera QR Scanner:</strong> Scan student QR passes on distribution day to automatically mark them collected — no paper lists.</div>
+            <div><strong>Payment Progress:</strong> See paid and outstanding counts for each product; view the relevant student details when following up.</div>
           </li>
           <li class="feat-item">
             <div class="feat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
-            <div><strong>Instant Bank Withdrawals:</strong> Transfer collected department funds directly to your verified bank account in seconds.</div>
+            <div><strong>Payout Preview &amp; Tracking:</strong> Review the fees and supplier amount before confirming a payout, then follow its processing status.</div>
+          </li>
+          <li class="feat-item">
+            <div class="feat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="15" y1="15.5" x2="20" y2="15.5"/><line x1="15" y1="19" x2="20" y2="19"/></svg>
+            </div>
+            <div><strong>QR Delivery Confirmation:</strong> Scan a student's order QR when you hand over an item to keep delivery records up to date.</div>
           </li>
         </ul>
       </div>
@@ -753,32 +766,32 @@
 <div id="how-it-works" class="steps-sec">
   <div class="wrap">
     <div class="section-label">How It Works</div>
-    <h2>Four Simple Steps from Signup to Collection</h2>
-    <p class="section-sub">The complete campus payment flow — from first account creation to QR-verified item distribution day.</p>
+    <h2>Four Simple Steps for Course Reps</h2>
+    <p class="section-sub">Publish your department catalog, follow payment progress, and keep distribution records clear.</p>
 
     <div class="steps-grid">
       <div class="step-card">
         <div class="step-num-badge">01</div>
-        <h3>Sign In with Matric Number &amp; Verify NIN</h3>
-        <p>Enter your matriculation number to get your full name automatically pre-loaded from the class roster. Then verify your identity with your National Identification Number (NIN) and set your secure 4-digit PIN.</p>
+        <h3>Upload Your Roster and Build the Catalog</h3>
+        <p>Import your department's class roster from CSV, then add the handouts, manuals, dues, or other items you are coordinating with clear prices and descriptions.</p>
       </div>
 
       <div class="step-card">
         <div class="step-num-badge">02</div>
-        <h3>Fund Your Campus Wallet Account</h3>
-        <p>Transfer money from any bank app — GTBank, First Bank, OPay, Kuda — to your personal CampusPay wallet account number. Funds arrive instantly and are ready for 1-click payments.</p>
+        <h3>Students Find and Pay for Items</h3>
+        <p>Students see the catalog connected to their department, choose an item, and complete the purchase through CampusPay.</p>
       </div>
 
       <div class="step-card">
         <div class="step-num-badge">03</div>
-        <h3>Select Item in Departmental Catalog</h3>
-        <p>Browse course handouts, lab manuals, or department dues listed by your Course Rep. Pick your item, confirm with your matric number and 4-digit PIN, and the payment clears instantly.</p>
+        <h3>Track Paid and Outstanding Students</h3>
+        <p>Review payment counts and the students associated with each product, so you know what has been paid for and who may need a reminder.</p>
       </div>
 
       <div class="step-card">
         <div class="step-num-badge">04</div>
-        <h3>Scan QR for Distribution Confirmation</h3>
-        <p>On collection day, show your digital QR pass on your phone. Your Course Rep scans it once with their camera to confirm your distribution — no paper receipts, no lists, no confusion.</p>
+        <h3>Scan to Confirm Delivery</h3>
+        <p>When you hand over a manual or other item, scan the student's QR order pass to record that it was delivered.</p>
       </div>
     </div>
   </div>
@@ -794,8 +807,8 @@
         </svg>
       </div>
       <div>
-        <h3>NIN Identity Verification &amp; Secure Transactions</h3>
-        <p>Every student profile is verified via National Identification Number (NIN) lookup upon registration — ensuring complete transparency, preventing impersonation, and keeping all departmental payment records 100% accurate and audit-ready.</p>
+        <h3>Clear Payment and Delivery Records</h3>
+        <p>Payments and QR delivery confirmations are recorded against the relevant product and order, giving course reps a clearer view of collection progress.</p>
       </div>
     </div>
   </div>
@@ -803,13 +816,13 @@
 
 <div class="cta-sec">
   <div class="wrap">
-    <h2 class="display">Ready to simplify your campus payments?</h2>
-    <p>Join students and department representatives using CampusPay today.</p>
-    <a class="btn" href="/Frontend/signup.html" style="display:inline-flex;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/></svg>
-      Create Your Account Now
+    <h2 class="display">Ready to make department collections easier?</h2>
+    <p>Course reps can manage their department catalog, track payment progress, and confirm item delivery from one workspace.</p>
+    <a class="btn" href="/Frontend/index.html" style="display:inline-flex;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Sign In to CampusPay
     </a>
-    <p class="cta-note">Built for Nigerian university students &amp; department representatives.</p>
+    <p class="cta-note">Students can access the catalog connected to their department after signing in.</p>
   </div>
 </div>
 
@@ -827,7 +840,7 @@
     </div>
 
     <div style="display:flex;align-items:center;">
-      <a href="/Frontend/signup.html">Sign Up</a>
+      <a href="/Frontend/signup.html">Student Sign Up</a>
       <a href="/Frontend/index.html">Sign In</a>
       <span style="margin-left:20px;">&copy; 2026 CampusPay. All rights reserved.</span>
     </div>
@@ -847,32 +860,32 @@
     const stepsData = [
       {
         tag: 'STEP 1 OF 4',
-        title: 'Matric Verification + NIN',
-        desc: 'Enter your matric number & NIN to verify your profile and set your 4-digit security PIN.',
+        title: 'Build Department Catalog',
+        desc: 'List the handouts, manuals, and department items your students need.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#0052FE" stroke-width="1.8"/><line x1="2" y1="10" x2="22" y2="10" stroke="#0052FE" stroke-width="1.8"/></svg>'
       },
       {
         tag: 'STEP 2 OF 4',
-        title: 'Fund Wallet',
-        desc: 'Transfer from any bank app (GTBank, OPay, FirstBank) to your dedicated virtual account number.',
+        title: 'Students Pay',
+        desc: 'Students find the catalog connected to their department and pay for the items they need.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0052FE" stroke-width="1.8"/><text x="12" y="16.5" font-size="11" font-weight="700" fill="#0052FE" text-anchor="middle" font-family="Inter">₦</text></svg>'
       },
       {
         tag: 'STEP 3 OF 4',
-        title: 'Select & Pay',
-        desc: 'Browse the departmental catalog, pick your item, and confirm with your matric number & PIN.',
+        title: 'Track Payment Progress',
+        desc: 'See paid and outstanding counts for each product and follow up where needed.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#0052FE" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="#0052FE" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#0052FE" stroke-width="1.8"/></svg>'
       },
       {
         tag: 'STEP 4 OF 4',
-        title: 'QR Distribution',
-        desc: 'Show your digital QR pass on collection day for instant camera verification. No paper needed.',
+        title: 'Confirm Delivery by QR',
+        desc: 'Scan the student’s order QR when handing over an item to record delivery.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="15.5" x2="20" y2="15.5" stroke="#0052FE" stroke-width="1.8"/><line x1="15" y1="19" x2="20" y2="19" stroke="#0052FE" stroke-width="1.8"/></svg>'
       },
       {
         tag: '= RESULT',
-        title: 'Zero Campus Stress',
-        desc: 'No paper receipts, no unconfirmed bank transfers, zero manual record keeping. Ever.',
+        title: 'Clear Records. Less Chasing.',
+        desc: 'Keep payment progress and delivery confirmations together in one clear record.',
         icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#0052FE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
       }
     ];
