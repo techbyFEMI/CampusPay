@@ -12,17 +12,6 @@ function createVendorCard(vendor) {
   img.alt = `${vendor.name} cover`;
   imageContainer.appendChild(img);
 
-  const badge = document.createElement('div');
-  badge.className = 'badge ' + (vendor.is_open ? 'open' : 'closed');
-  const dot = document.createElement('span');
-  dot.className = 'dot';
-  dot.textContent = vendor.is_open ? '●' : '●';
-  badge.appendChild(dot);
-  const badgeText = document.createElement('span');
-  badgeText.textContent = vendor.is_open ? 'Open' : 'Closed';
-  badge.appendChild(badgeText);
-  imageContainer.appendChild(badge);
-
   const content = document.createElement('div');
   content.className = 'card-content';
   const h2 = document.createElement('h2');
@@ -38,11 +27,6 @@ function createVendorCard(vendor) {
   metaPhone.className = 'meta-info';
   metaPhone.innerHTML = `<i class="fa-solid fa-phone"></i> ${vendor.phone}`;
   content.appendChild(metaPhone);
-
-  const idLine = document.createElement('div');
-  idLine.className = 'meta-info';
-  idLine.innerHTML = `<i class="fa-solid fa-id-badge"></i> ${vendor.vendor_id}`;
-  content.appendChild(idLine);
 
   const btn = document.createElement('button');
   btn.className = 'action-btn';

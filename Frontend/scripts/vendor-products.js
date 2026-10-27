@@ -27,7 +27,6 @@ const editPrice       = document.getElementById('edit-price');
 const editDesc        = document.getElementById('edit-description');
 const editImageInput  = document.getElementById('edit-image');
 const editImagePreview= document.getElementById('edit-image-preview');
-const editAvailable   = document.getElementById('edit-available');
 const saveBtn         = document.getElementById('save-btn');
 const editError       = document.getElementById('edit-error');
 
@@ -159,9 +158,11 @@ function createProductRow(product) {
       ${product.description ? `<div class="product-desc">${escHtml(product.description)}</div>` : ''}
     </div>
     <span class="product-price">${formatMoney(product.price)}</span>
-    <span class="availability-badge ${isAvail ? 'available' : 'unavailable'}">
-      ${isAvail ? '● Available' : '○ Off'}
-    </span>
+    <label class="availability-toggle">
+      <span>${isAvail ? 'Available' : 'Unavailable'}</span>
+      <input class="availability-input" type="checkbox" aria-label="Allow purchases for ${escAttr(product.name)}" ${isAvail ? 'checked' : ''}>
+      <span class="toggle-track"></span>
+    </label>
     <div class="product-actions">
       <button class="action-icon-btn edit-btn" title="Edit" data-product-id="${escAttr(product.product_id)}">
         <i class="fa-solid fa-pen-to-square"></i>
@@ -174,6 +175,9 @@ function createProductRow(product) {
 
   row.querySelector('.edit-btn').addEventListener('click', () => openEditModal(product));
   row.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(product));
+  row.querySelector('.availability-input').addEventListener('change', (event) => {
+    updateProductAvailability(product, event.currentTarget);
+  });
 
   if (isFirestoreImage) {
     const imgEl = row.querySelector('img');
@@ -247,10 +251,42 @@ function openEditModal(product) {
   editName.value = product.name;
   editPrice.value = product.price;
   editDesc.value = product.description || '';
-  editAvailable.checked = product.is_available;
   editError.classList.add('hidden');
   resetEditImageSelection();
   editModal.classList.add('open');
+}
+
+async function updateProductAvailability(product, input) {
+  const nextAvailability = input.checked;
+  input.disabled = true;
+  const token = await getToken();
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/catalog/products/${encodeURIComponent(product.product_id)}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ is_available: nextAvailability }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Could not update product availability.');
+    }
+
+    product.is_available = nextAvailability;
+    input.closest('.availability-toggle').querySelector('span').textContent =
+      nextAvailability ? 'Available' : 'Unavailable';
+    showToast(nextAvailability ? 'Students can now purchase this item.' : 'Purchases are paused for this item.', 'success');
+  } catch (err) {
+    console.error('Availability update error', err);
+    input.checked = !nextAvailability;
+    showToast(err.message || 'Could not update product availability.', 'error');
+  } finally {
+    input.disabled = false;
+  }
 }
 
 function closeEditModal() {
@@ -382,7 +418,6 @@ async function handleSaveEdit(e) {
   const name  = editName.value.trim();
   const price = parseFloat(editPrice.value);
   const desc  = editDesc.value.trim();
-  const isAvail = editAvailable.checked;
 
   if (!name) return showFormError(editError, 'Product name is required.');
   if (!price || price <= 0) return showFormError(editError, 'Price must be greater than zero.');
@@ -395,7 +430,6 @@ async function handleSaveEdit(e) {
       name,
       price,
       description: desc || null,
-      is_available: isAvail,
     };
 
     if (selectedEditImageFile) {

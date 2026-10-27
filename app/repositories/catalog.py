@@ -10,15 +10,11 @@ class CatalogRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def list_reps(self, is_open: bool | None = None):
+    async def list_reps(self):
         statement = select(users).where(
             users.role.in_((approles.Rep, approles.Admin))
         )
-        if is_open is not None:
-            statement = statement.where(users.rep_is_open == is_open)
-        statement = statement.order_by(
-            users.rep_is_open.desc(), users.full_name.asc()
-        )
+        statement = statement.order_by(users.full_name.asc())
         result = await self.session.execute(statement)
         return result.scalars().all()
 

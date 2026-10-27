@@ -85,9 +85,6 @@ class users(Base):
     )
 
     rep_location: Mapped[str | None] = mapped_column(String, nullable=True)
-    rep_is_open: Mapped[bool] = mapped_column(
-        Boolean, server_default="false", default=False
-    )
     rep_cover_image_url: Mapped[str | None] = mapped_column(String, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(

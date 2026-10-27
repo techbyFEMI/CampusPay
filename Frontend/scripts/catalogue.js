@@ -119,8 +119,7 @@ function renderVendorHeader(vendor) {
 	info.className = 'vendor-info';
 	info.innerHTML = `<h2>${vendor.name}</h2>
 	<div class="meta-info"><i class="fa-solid fa-location-dot"></i> ${vendor.location}</div>
-	<div class="meta-info"><i class="fa-solid fa-phone"></i> ${vendor.phone}</div>
-	<div class="meta-info">Status: ${vendor.is_open ? 'Open' : 'Closed'}</div>`;
+	<div class="meta-info"><i class="fa-solid fa-phone"></i> ${vendor.phone}</div>`;
 
 	wrap.appendChild(info);
 	header.appendChild(wrap);

@@ -7,7 +7,6 @@ class RepSummary(BaseModel):
     name: str
     location: str | None
     phone: str | None
-    is_open: bool
     cover_image_url: str | None
 
     model_config = {"from_attributes": True}
@@ -30,7 +29,6 @@ class RepDetail(BaseModel):
     name: str
     location: str | None
     phone: str | None
-    is_open: bool
     cover_image_url: str | None
     products: list[ProductItem]
 

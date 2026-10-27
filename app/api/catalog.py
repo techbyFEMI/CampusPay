@@ -44,13 +44,9 @@ def _raise_catalog_error(error: Exception) -> None:
 
 @router.get("/reps", response_model=list[RepSummary])
 async def list_reps(
-    is_open: Annotated[
-        bool | None,
-        Query(description="Filter by open/closed status. Omit to include all reps."),
-    ] = None,
     db: AsyncSession = Depends(get_db),
 ) -> list[RepSummary]:
-    return await _catalog_service(db).list_reps(is_open=is_open)
+    return await _catalog_service(db).list_reps()
 
 
 @router.get("/reps/{rep_id}", response_model=RepDetail)

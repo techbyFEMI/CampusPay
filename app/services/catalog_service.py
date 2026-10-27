@@ -31,15 +31,14 @@ class CatalogService:
         self.catalog_repository = catalog_repository
         self.user_repository = user_repository
 
-    async def list_reps(self, is_open: bool | None = None) -> list[RepSummary]:
-        reps = await self.catalog_repository.list_reps(is_open=is_open)
+    async def list_reps(self) -> list[RepSummary]:
+        reps = await self.catalog_repository.list_reps()
         return [
             RepSummary(
                 rep_id=rep.user_id,
                 name=rep.full_name,
                 location=rep.rep_location,
                 phone=rep.phone,
-                is_open=rep.rep_is_open,
                 cover_image_url=rep.rep_cover_image_url,
             )
             for rep in reps
@@ -60,7 +59,6 @@ class CatalogService:
             name=rep.full_name,
             location=rep.rep_location,
             phone=rep.phone,
-            is_open=rep.rep_is_open,
             cover_image_url=rep.rep_cover_image_url,
             products=[
                 ProductItem(
